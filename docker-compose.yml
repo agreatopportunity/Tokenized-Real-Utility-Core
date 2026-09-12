@@ -1,0 +1,107 @@
+# ============================================================================
+# TRU Blockchain — compose definitions
+#
+#   docker compose up -d node          # headless seed/peer node
+#   docker compose --profile miner up -d miner
+#   docker compose --profile gpu   up -d gpu-miner
+#
+# The 'node' service is the one most people want. The miner profiles are
+# opt-in so a plain 'docker compose up -d' never starts mining unexpectedly.
+# ============================================================================
+
+services:
+
+  # -------------------------------------------------------------------------
+  # Headless node — syncs blocks, serves peers. This is the default.
+  # -------------------------------------------------------------------------
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: tru-node:latest
+    container_name: tru-node
+    restart: unless-stopped
+    ports:
+      # P2P — this one is meant to be publicly reachable.
+      - "21833:21833"
+      # JSON-RPC — host loopback only. Patch 05 also requires Bearer/cookie auth.
+      # Container config uses rpcbind=0.0.0.0 + rpcAllowRemote=1 only so Docker
+      # can publish the port to host loopback; do not publish it publicly.
+      - "127.0.0.1:21832:21832"
+    volumes:
+      - tru-data:/app/data
+      - ./tru.conf:/app/tru.conf:ro
+      - tru-rpc-auth:/run/tru-rpc
+    environment:
+      TRU_RPC_COOKIE_FILE: /run/tru-rpc/token
+    # --cli needs a terminal. These two lines give the container one so the
+    # menu works with 'docker attach'. Drop both once --daemon exists.
+    stdin_open: true
+    tty: true
+    command: ["--cli"]
+    healthcheck:
+      test: ["CMD-SHELL", "ss -ltn | grep -q ':21833' || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  # -------------------------------------------------------------------------
+  # CPU miner (opt-in: --profile miner)
+  # Shares the same chain data volume as the node, so run only ONE of these
+  # at a time against a given volume — LevelDB allows a single writer.
+  # -------------------------------------------------------------------------
+  miner:
+    profiles: ["miner"]
+    build:
+      context: .
+      dockerfile: Dockerfile.miner
+      target: runtime
+      args:
+        MINER_TARGET: tru_miner_cpu
+    image: tru-miner-cpu:latest
+    container_name: tru-miner-cpu
+    restart: unless-stopped
+    volumes:
+      - miner-data:/app/data
+      - ./tru.conf:/app/tru.conf:ro
+      - tru-rpc-auth:/run/tru-rpc:ro
+    environment:
+      TRU_RPC_COOKIE_FILE: /run/tru-rpc/token
+    stdin_open: true
+    tty: true
+
+  # -------------------------------------------------------------------------
+  # GPU miner (opt-in: --profile gpu)
+  # Requires the NVIDIA Container Toolkit on the host. See README.
+  # -------------------------------------------------------------------------
+  gpu-miner:
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: tru-miner-gpu:latest
+    container_name: tru-miner-gpu
+    restart: unless-stopped
+    volumes:
+      - gpu-miner-data:/app/data
+      - ./tru.conf:/app/tru.conf:ro
+      - tru-rpc-auth:/run/tru-rpc:ro
+    environment:
+      TRU_RPC_COOKIE_FILE: /run/tru-rpc/token
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility]
+
+volumes:
+  tru-rpc-auth:
+  tru-data:
+  miner-data:
+  gpu-miner-data:

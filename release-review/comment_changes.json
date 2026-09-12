@@ -1,0 +1,3452 @@
+[
+  {
+    "file": "src/address_helpers.h",
+    "line": 22,
+    "before": "Patch 15C: decodeBase58Check() is defined below; declare it here so the",
+    "after": "decodeBase58Check() is defined below; declare it here so the"
+  },
+  {
+    "file": "src/address_helpers.h",
+    "line": 26,
+    "before": "Patch 15C: canonical TRU mainnet P2PKH validation.",
+    "after": "canonical TRU mainnet P2PKH validation."
+  },
+  {
+    "file": "src/address_helpers.h",
+    "line": 211,
+    "before": "Log the mismatch so you can see the difference",
+    "after": "Log the address mismatch for diagnosis."
+  },
+  {
+    "file": "src/address_helpers.h",
+    "line": 397,
+    "before": "Patch 15C: removed unused duplicate script-to-address encoder.",
+    "after": "removed unused duplicate script-to-address encoder."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 54,
+    "before": "If you want binary, you can compress before hex.",
+    "after": ""
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 58,
+    "before": "We'll store ASCII directly in script (your serializer already writes raw bytes)",
+    "after": "Store ASCII directly in the script; serialization preserves the bytes."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 59,
+    "before": "If you prefer strict-hex payloads, replace with hexEncode(payload) and decode on read.",
+    "after": ""
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 106,
+    "before": "FIX(patch15): normalize text extraction across OpenAI-compatible,",
+    "after": "normalize text extraction across OpenAI-compatible,"
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 205,
+    "before": "If your rpcListUnspent already returns the same shape, you can skip this.",
+    "after": "Adapt wallet UTXOs to the RPC result shape."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 214,
+    "before": "adjust if your field name differs",
+    "after": "UTXO script bytes."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 220,
+    "before": "Pick the first UTXO >= minNeeded (simple strategy; improve if you want)",
+    "after": "Select the first UTXO whose value is at least minNeeded."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 295,
+    "before": "non-witness version in your codebase",
+    "after": "Non-witness transaction."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 345,
+    "before": "TOKEN EVOLUTION ON-CHAIN ANCHOR (PATCH 22)",
+    "after": "TOKEN EVOLUTION ON-CHAIN ANCHOR"
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 1526,
+    "before": "Patch 18: removed the unused createAIRequestTransaction() prototype path.",
+    "after": "removed the unused createAIRequestTransaction() prototype path."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 1604,
+    "before": "FIX(patch15): NEVER persist cloud API keys into ContractStorage.",
+    "after": "NEVER persist cloud API keys into ContractStorage."
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 1793,
+    "before": "Patch 18: the legacy response-script builder that used OP_DATAFEED as a",
+    "after": "the legacy response-script builder that used OP_DATAFEED as a"
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 1798,
+    "before": "MANUAL LIVING TOKEN EVOLUTION PREVIEW (PATCH 19)",
+    "after": "MANUAL LIVING TOKEN EVOLUTION PREVIEW"
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 1857,
+    "before": "TOKEN EVOLUTION ANCHOR QUEUE (PATCH 22)",
+    "after": "TOKEN EVOLUTION ANCHOR QUEUE"
+  },
+  {
+    "file": "src/ai_oracle_service.cpp",
+    "line": 2746,
+    "before": "Also store in global blockchain storage (as you had)",
+    "after": "Also persist in global blockchain storage."
+  },
+  {
+    "file": "src/ai_oracle_service.h",
+    "line": 16,
+    "before": "FIX(patch16): declaration now matches the implementation in",
+    "after": "declaration now matches the implementation in"
+  },
+  {
+    "file": "src/ai_oracle_service.h",
+    "line": 27,
+    "before": "FIX(patch22): signed on-chain commitment for a living-token evolution.",
+    "after": "signed on-chain commitment for a living-token evolution."
+  },
+  {
+    "file": "src/ai_oracle_service.h",
+    "line": 62,
+    "before": "FIX(patch22): retryable queue -> signed evolution anchor processor.",
+    "after": "retryable queue -> signed evolution anchor processor."
+  },
+  {
+    "file": "src/ai_oracle_service.h",
+    "line": 65,
+    "before": "FIX(patch19): provider-agnostic manual SFT/NCFT evolution preview.",
+    "after": "provider-agnostic manual SFT/NCFT evolution preview."
+  },
+  {
+    "file": "src/ai_oracle_service.h",
+    "line": 100,
+    "before": "Patch 18: legacy OP_DATAFEED-based response transaction builder removed.",
+    "after": "legacy OP_DATAFEED-based response transaction builder removed."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 46,
+    "before": "FIX(patch14): shared HTTPS JSON POST transport for cloud AI providers.",
+    "after": "shared HTTPS JSON POST transport for cloud AI providers."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 210,
+    "before": "FIX(patch16b): oracle credentials are loaded internally by",
+    "after": "oracle credentials are loaded internally by"
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 256,
+    "before": "FIX(patch18): optional environment authentication for local Oobabooga.",
+    "after": "optional environment authentication for local Oobabooga."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 320,
+    "before": "FIX(patch14): current non-reasoning model with Chat Completions support.",
+    "after": "current non-reasoning model with Chat Completions support."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 375,
+    "before": "FIX(patch14): real HTTPS JSON transport.",
+    "after": "real HTTPS JSON transport."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 483,
+    "before": "FIX(patch17): First-class Nemotron harness provider.",
+    "after": "First-class Nemotron harness provider."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 505,
+    "before": "FIX(patch21): endpoint priority:",
+    "after": "endpoint priority:"
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 538,
+    "before": "FIX(patch21): process-level endpoint override.",
+    "after": "process-level endpoint override."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 626,
+    "before": "FIX(patch17): real local JSON transport.",
+    "after": "real local JSON transport."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 636,
+    "before": "FIX(patch14): current xAI Chat Completions model.",
+    "after": "current xAI Chat Completions model."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 690,
+    "before": "FIX(patch14): xAI uses Bearer auth and an OpenAI-compatible",
+    "after": "xAI uses Bearer auth and an OpenAI-compatible"
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 696,
+    "before": "FIX(patch18): Google Gemini provider.",
+    "after": "Google Gemini provider."
+  },
+  {
+    "file": "src/ai_providers.cpp",
+    "line": 903,
+    "before": "FIX(patch17): real JSON transport with configurable authentication.",
+    "after": "real JSON transport with configurable authentication."
+  },
+  {
+    "file": "src/animated_background.h",
+    "line": 1,
+    "before": "Add this new file: animated_background.h",
+    "after": "Animated terminal background."
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 19,
+    "before": "coinbase with a ZK? Just a stub, or real logic",
+    "after": "Placeholder: coinbase zero-knowledge verification is not implemented."
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 21,
+    "before": "If you had \"tx.isZKProof\" => do real checks",
+    "after": "Placeholder: this function does not verify a zero-knowledge proof."
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 143,
+    "before": "TRU Security Patch 09 v4:",
+    "after": ""
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 431,
+    "before": "TRU Security Patch 09 v4:",
+    "after": ""
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 577,
+    "before": "FIX(patch26): Living-token evolution anchors are normal OP_RETURN",
+    "after": "Living-token evolution anchors are normal OP_RETURN"
+  },
+  {
+    "file": "src/block.cpp",
+    "line": 953,
+    "before": "FIX(patch26): evolution proof, not a TRUScript transfer.",
+    "after": "evolution proof, not a TRUScript transfer."
+  },
+  {
+    "file": "src/block.h",
+    "line": 83,
+    "before": "TRU Security Patch 09 v4: legacy wire/disk field only. It is not",
+    "after": "legacy wire/disk field only. It is not"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 2,
+    "before": "FIX(patch47): shared block/network size limits",
+    "after": "shared block/network size limits"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 35,
+    "before": "Patch 05: authenticated local RPC",
+    "after": "authenticated local RPC"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 37,
+    "before": "Patch 08B.3b: PID-scoped validation sandbox names",
+    "after": "PID-scoped validation sandbox names"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 54,
+    "before": "TRU Security Patch 08A v4: safe candidate-height narrowing",
+    "after": "safe candidate-height narrowing"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 60,
+    "before": "Patch 14B: shared execution context",
+    "after": "shared execution context"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 62,
+    "before": "Patch 14D3B: confirmed state snapshot + scratch execution",
+    "after": "confirmed state snapshot + scratch execution"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 80,
+    "before": "FIX(patch47): limits live in tru_limits.h so consensus validation, mining,",
+    "after": "limits live in tru_limits.h so consensus validation, mining,"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 83,
+    "before": "TRU Security Patch 08A v4: hard bounds for attacker-supplied side-chain data.",
+    "after": "hard bounds for attacker-supplied side-chain data."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 90,
+    "before": "Patch 08B.4D.1 v1: runtime stale-side pruning is deliberately bounded.",
+    "after": "runtime stale-side pruning is deliberately bounded."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 94,
+    "before": "Patch 08B.4A v2: journal retention and maximum supported fork depth are a",
+    "after": "journal retention and maximum supported fork depth are a"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 100,
+    "before": "Patch 08B.4D.3 v1b: hard bounded active-U4 maintenance budgets.",
+    "after": "hard bounded active-U4 maintenance budgets."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 115,
+    "before": "Patch 08B.3b: keep disposable candidate databases beside the configured",
+    "after": "keep disposable candidate databases beside the configured"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 151,
+    "before": "Patch 08B.3c: these local runtime-test gates exist only in explicitly opted-in",
+    "after": "these local runtime-test gates exist only in explicitly opted-in"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 158,
+    "before": "Patch 08B.4D.2T v1: extra DEV-only mutation gate.",
+    "after": "extra DEV-only mutation gate."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 173,
+    "before": "Patch 08B.4B.1T v1: deterministic local fail-stop injection. Compiled only",
+    "after": "deterministic local fail-stop injection. Compiled only"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 179,
+    "before": "Patch 08B.4B.1T v2: deterministic HARD-CRASH witness for the two-stage",
+    "after": "deterministic HARD-CRASH witness for the two-stage"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 214,
+    "before": "Patch 08B.4D.9A: production activation gate definition ONLY. The exact",
+    "after": "production activation gate definition ONLY. The exact"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 228,
+    "before": "TRU Security Patch 08B.1 v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 308,
+    "before": "TRU Security Patch 08B.4A: durable reorganization PLAN/PREFLIGHT state.",
+    "after": "durable reorganization PLAN/PREFLIGHT state."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 316,
+    "before": "Patch 08B.4D.4 v1b: positive candidate-validation cache.",
+    "after": "positive candidate-validation cache."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 326,
+    "before": "Patch 08B.4D.5 v1b: immutable candidate-reject cache.",
+    "after": "immutable candidate-reject cache."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 335,
+    "before": "Patch 08B.4D.6 v1: per-source expensive candidate-sandbox budget.",
+    "after": "per-source expensive candidate-sandbox budget."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 344,
+    "before": "Patch 08B.4D.7 v1: aggregate expensive-sandbox budget across ALL untrusted",
+    "after": "aggregate expensive-sandbox budget across ALL untrusted"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 353,
+    "before": "Patch 08B.4B.1 v2: execution markers are deliberately a different rules",
+    "after": "execution markers are deliberately a different rules"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 722,
+    "before": "Patch 08B.1 v4: a valid journal proves what was atomically written",
+    "after": "a valid journal proves what was atomically written"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 1115,
+    "before": "TRU Security Patch 08B.2: authenticated U4 journal reader for a single",
+    "after": "authenticated U4 journal reader for a single"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 1937,
+    "before": "TRU Security Patch 10: shared invariant",
+    "after": "shared invariant"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 1941,
+    "before": "TRU Security Patch 09: strict compact-target + chainwork helpers.",
+    "after": "strict compact-target + chainwork helpers."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 1952,
+    "before": "TRU Security Patch 11: coinbase height commitment.",
+    "after": "coinbase height commitment."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 1999,
+    "before": "TRU Security Patch 12A: cheap structural transaction limits before BIP30",
+    "after": "cheap structural transaction limits before BIP30"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 2062,
+    "before": "Patch 15A — transaction-level activated stateful creation validation.",
+    "after": "transaction-level activated stateful creation validation."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 2231,
+    "before": "Patch 08B.4A.1a v2: shutdown is a lifetime barrier, not a best-effort",
+    "after": "shutdown is a lifetime barrier, not a best-effort"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 2673,
+    "before": "TRU Security Patch 06:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 2936,
+    "before": "TRU Security Patch 09:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3107,
+    "before": "TRU Security Patch 07:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3193,
+    "before": "TRU Security Patch 12A: enforce cheap byte/count limits before expensive",
+    "after": "enforce cheap byte/count limits before expensive"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3299,
+    "before": "TRU Security Patch 03:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3386,
+    "before": "TRU Security Patch 11: every non-genesis coinbase must commit to the",
+    "after": "every non-genesis coinbase must commit to the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3401,
+    "before": "FIX(patch48): the coinbase amount is NOT validated here any more.",
+    "after": "the coinbase amount is NOT validated here any more."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3455,
+    "before": "Patch 14D3A2 — retain creation classification while validating",
+    "after": "retain creation classification while validating"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3506,
+    "before": "TRU Security Patch 02:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3522,
+    "before": "Script verification (your existing code)",
+    "after": "Script verification."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3539,
+    "before": "TRU Smart Contract Patch 13A — leading OP_RETURN outputs are unspendable.",
+    "after": "leading OP_RETURN outputs are unspendable."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3560,
+    "before": "TRU Smart Contract Patch 14D3B — owner-authorized Stateful K/V",
+    "after": "owner-authorized Stateful K/V"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3728,
+    "before": "TRU Smart Contract Patch 14B — consensus context is built from",
+    "after": "consensus context is built from"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3743,
+    "before": "TRU Smart Contract Patch 14C — state is scoped by the locking UTXO",
+    "after": "state is scoped by the locking UTXO"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3829,
+    "before": "TRU Security Patch 02:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3847,
+    "before": "TRU Security Patch 02:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3901,
+    "before": "TRU Security Patch 07: difficulty is anchored to THIS block's parent.",
+    "after": "difficulty is anchored to THIS block's parent."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 3987,
+    "before": "FIX(patch47): serialize() is already bytes",
+    "after": "serialize() is already bytes"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4002,
+    "before": "FIX(patch47): serialize() is already bytes",
+    "after": "serialize() is already bytes"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4147,
+    "before": "FIXED: Calculate reported hash rate from active miners with longer timeout",
+    "after": "Calculate reported hash rate from active miners with longer timeout"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4157,
+    "before": "FIXED: Increased timeout from 1 to 3 minutes for more stable reporting",
+    "after": "Increased timeout from 1 to 3 minutes for more stable reporting"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4198,
+    "before": "FIXED: More accurate hashrate calculation",
+    "after": "More accurate hashrate calculation"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4219,
+    "before": "FIXED: Improved priority logic",
+    "after": "Improved priority logic"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4232,
+    "before": "FIXED: More reasonable ratio checking (factor of 5 instead of 10)",
+    "after": "More reasonable ratio checking (factor of 5 instead of 10)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4236,
+    "before": "FIXED: Weight reported hashrate more heavily since it's real-time",
+    "after": "Weight reported hashrate more heavily since it's real-time"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4252,
+    "before": "FIXED: Add minimum threshold to avoid tiny values",
+    "after": "Add minimum threshold to avoid tiny values"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4301,
+    "before": "FIXED: Increase cap for modern GPU miners (10 TH/s)",
+    "after": "Increase cap for modern GPU miners (10 TH/s)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4309,
+    "before": "FIXED: More conservative moving average (85% new, 15% old)",
+    "after": "More conservative moving average (85% new, 15% old)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4325,
+    "before": "FIXED: Don't reset hash rate to 0 immediately, just update timestamp",
+    "after": "Don't reset hash rate to 0 immediately, just update timestamp"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4370,
+    "before": "FIXED: Increased timeout to match getNetworkHashrate (3 minutes + 1 minute buffer)",
+    "after": "Increased timeout to match getNetworkHashrate (3 minutes + 1 minute buffer)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4431,
+    "before": "TRU Security Patch 07:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4690,
+    "before": "FIX(patch49): same key-parsing bug as the explorer's startup cache.",
+    "after": "same key-parsing bug as the explorer's startup cache."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4707,
+    "before": "Patch 21: address indexes historically may contain contract",
+    "after": "address indexes historically may contain contract"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4920,
+    "before": "Patch 21: exact display-only scaling without integer overflow.",
+    "after": "exact display-only scaling without integer overflow."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 4930,
+    "before": "Patch 21: read-only registry view used by Contract Vault classification.",
+    "after": "read-only registry view used by Contract Vault classification."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5010,
+    "before": "Patch 20 v2: Contract Vault maturity uses the same parent-chain MTP",
+    "after": "Contract Vault maturity uses the same parent-chain MTP"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5283,
+    "before": "Patch 21: bridge enrichment is classification-preserving.",
+    "after": "bridge enrichment is classification-preserving."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5523,
+    "before": "Patch 21: canonical ContractStorage keys are",
+    "after": "canonical ContractStorage keys are"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5693,
+    "before": "FIX(patch9): use the ONE canonical PoW verifier (rebuilds header,",
+    "after": "use the ONE canonical PoW verifier (rebuilds header,"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5795,
+    "before": "FIX(patch8): the old 0x2400ffff special-case forced a max (zero-diff)",
+    "after": "the old 0x2400ffff special-case forced a max (zero-diff)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 5836,
+    "before": "STRICT COMPACT TARGET / 256-BIT CHAINWORK (PATCH 09)",
+    "after": "STRICT COMPACT TARGET / 256-BIT CHAINWORK"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6277,
+    "before": "FIX(patch8): ~16.8M hashes/block, real work; retarget climbs to 60s",
+    "after": "~16.8M hashes/block, real work; retarget climbs to 60s"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6334,
+    "before": "Patch 08B.4A: inspect any durable PREPARED reorg intent before worker",
+    "after": "inspect any durable PREPARED reorg intent before worker"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6544,
+    "before": "TRU Security Patch 09: authoritative work is now uint256 in blockIndex.",
+    "after": "authoritative work is now uint256 in blockIndex."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6557,
+    "before": "PATCH 08B.4D.5 v1b - BOUNDED IMMUTABLE NEGATIVE CANDIDATE CACHE",
+    "after": "BOUNDED IMMUTABLE NEGATIVE CANDIDATE CACHE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6662,
+    "before": "TRU Security Patch 08A v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6710,
+    "before": "Patch 08B.4D.5 v1b:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 6945,
+    "before": "PATCH 08B.4A - DURABLE REORG PLAN + PREFLIGHT (NO EXECUTOR)",
+    "after": "DURABLE REORG PLAN + PREFLIGHT (NO EXECUTOR)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 7510,
+    "before": "PATCH 08B.4C.1 - AUTHENTICATED RECOVERY-STATE CLASSIFIER",
+    "after": "AUTHENTICATED RECOVERY-STATE CLASSIFIER"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 7962,
+    "before": "Patch 08B.4C.1a v1:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 8867,
+    "before": "PATCH 08B.4D.4 v1b - BOUNDED POSITIVE CANDIDATE VALIDATION CACHE",
+    "after": "BOUNDED POSITIVE CANDIDATE VALIDATION CACHE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 9194,
+    "before": "PATCH 08B.4D.6 v1 - PER-SOURCE EXPENSIVE CANDIDATE-SANDBOX BUDGET",
+    "after": "PER-SOURCE EXPENSIVE CANDIDATE-SANDBOX BUDGET"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 9526,
+    "before": "Patch 08B.4D.4 v1b: build the positive-cache witness only AFTER",
+    "after": "build the positive-cache witness only AFTER"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 9569,
+    "before": "Patch 08B.4D.6 v1: charge ONLY a real positive-cache MISS that is about",
+    "after": "charge ONLY a real positive-cache MISS that is about"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 9723,
+    "before": "PATCH 08B.4B.1 - CONTROLLED MULTI-BLOCK REORG EXECUTOR (MANUAL ONLY)",
+    "after": "CONTROLLED MULTI-BLOCK REORG EXECUTOR (MANUAL ONLY)"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 10139,
+    "before": "Patch 08B.4B.1T v1: deterministic fail-stop only AFTER the first",
+    "after": "deterministic fail-stop only AFTER the first"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 10291,
+    "before": "Patch 08B.4B.1T v1: second deterministic recovery witness. The fault",
+    "after": "second deterministic recovery witness. The fault"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 10424,
+    "before": "PATCH 08B.4C.2 v2 - AUTHENTICATED FINISH-FORWARD CRASH RECOVERY",
+    "after": "AUTHENTICATED FINISH-FORWARD CRASH RECOVERY"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 10619,
+    "before": "Patch 08B.4C.2 v2:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 11857,
+    "before": "Patch 08B.4C.1: classify authenticated E2 execution progress BEFORE the",
+    "after": "classify authenticated E2 execution progress BEFORE the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 11992,
+    "before": "PATCH 08B.3T v2 - CONTROLLED LOCAL RUNTIME TEST HOOKS",
+    "after": "CONTROLLED LOCAL RUNTIME TEST HOOKS"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 11993,
+    "before": "Patch 08B.3c: compile-time excluded from production builds by default.",
+    "after": "compile-time excluded from production builds by default."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 12141,
+    "before": "Patch 08B.3c: production-like validation only needs to walk the",
+    "after": "production-like validation only needs to walk the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 12216,
+    "before": "Patch 14D3B1: optional contract-specific witness layered around the",
+    "after": "optional contract-specific witness layered around the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 12568,
+    "before": "Patch 08B.3c: synchronize the final runtime difficulty witness with",
+    "after": "synchronize the final runtime difficulty witness with"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 12826,
+    "before": "PATCH 08B.4D.2T v1 - DEV-ONLY CONTROLLED SIDE-PRESSURE FIXTURE",
+    "after": "DEV-ONLY CONTROLLED SIDE-PRESSURE FIXTURE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 13400,
+    "before": "PATCH 08B.4D.4T v1a - DEV-ONLY POSITIVE-CACHE FIFO CHURN FIXTURE",
+    "after": "DEV-ONLY POSITIVE-CACHE FIFO CHURN FIXTURE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 13751,
+    "before": "PATCH 08B.4D.5T v1c - DEV-ONLY IMMUTABLE NEGATIVE-CACHE FIFO CHURN FIXTURE",
+    "after": "DEV-ONLY IMMUTABLE NEGATIVE-CACHE FIFO CHURN FIXTURE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 14084,
+    "before": "PATCH 08B.3 v2 - FULL STATEFUL CANDIDATE VALIDATION IN SANDBOX",
+    "after": "FULL STATEFUL CANDIDATE VALIDATION IN SANDBOX"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 14541,
+    "before": "PATCH 08B.4D.2 v1 - WORK-AWARE SIDE-POOL SINGLE-LEAF REPLACEMENT",
+    "after": "WORK-AWARE SIDE-POOL SINGLE-LEAF REPLACEMENT"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 15307,
+    "before": "TRU Security Patch 08A v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 15393,
+    "before": "Patch 08B.4D.2 v1: capacity checks are intentionally deferred",
+    "after": "capacity checks are intentionally deferred"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 15414,
+    "before": "Patch 08B.4D.2 v1: full side validation is complete. Only now may",
+    "after": "full side validation is complete. Only now may"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 15590,
+    "before": "PATCH 08B.4D.1 v1a — BOUNDED RUNTIME STALE-SIDE PRUNING",
+    "after": "BOUNDED RUNTIME STALE-SIDE PRUNING"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 15595,
+    "before": "PATCH 08B.4D.3 v1b - ACTIVE-CHAIN U4 RETENTION CORE",
+    "after": "ACTIVE-CHAIN U4 RETENTION CORE"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 16415,
+    "before": "Patch 08B.4C.0 v1:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 16734,
+    "before": "TRU Security Patch 06: private confirmed-state connector.",
+    "after": "private confirmed-state connector."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 16922,
+    "before": "TRU Security Patch 09: calculate work BEFORE state mutation.",
+    "after": "calculate work BEFORE state mutation."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17071,
+    "before": "Patch 08B.4B.1T v2:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17118,
+    "before": "Patch 08B.3T v2: difficulty is active-tip metadata. Rollback restores",
+    "after": "difficulty is active-tip metadata. Rollback restores"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17349,
+    "before": "FIX(patch51): reject a second issuance of the same tokenID",
+    "after": "reject a second issuance of the same tokenID"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17578,
+    "before": "TRU Smart Contract Patch 14B1 — keep even the current applyBlock",
+    "after": "keep even the current applyBlock"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17586,
+    "before": "Patch 20 v2: applyTransaction() does not execute scripts. Leave",
+    "after": "applyTransaction() does not execute scripts. Leave"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17708,
+    "before": "Patch 08B.1: parse canonical \"utxo:<txid>:<vout>\" once and",
+    "after": "parse canonical \"utxo:<txid>:<vout>\" once and"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17837,
+    "before": "Patch 08B.1 v4: use the same canonical outpoint parser as the",
+    "after": "use the same canonical outpoint parser as the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17907,
+    "before": "Patch 08B.1: no pre-commit mempool mutation here.",
+    "after": "no pre-commit mempool mutation here."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 17934,
+    "before": "Patch 15A — activated state-root creation persistence for K/V V1 and",
+    "after": "activated state-root creation persistence for K/V V1 and"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 18064,
+    "before": "Patch 15A — persist validated K/V V1 or Voting V1 continuation calls.",
+    "after": "persist validated K/V V1 or Voting V1 continuation calls."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 18674,
+    "before": "Patch 08B.1 v4: address transaction counts are confirmed-state data.",
+    "after": "address transaction counts are confirmed-state data."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 18792,
+    "before": "FIX(patch49): these two writes to addressCache were unsynchronised",
+    "after": "these two writes to addressCache were unsynchronised"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19130,
+    "before": "PATCH 08B.4D.9A - PRODUCTION ACTIVATION GATE + FAIL-STOP PLUMBING ONLY",
+    "after": "PRODUCTION ACTIVATION GATE + FAIL-STOP PLUMBING ONLY"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19186,
+    "before": "PATCH 08B.4D.9B - INCOMING STRICT-WINNING SIDE-TIP ACTIVATION ONLY",
+    "after": "INCOMING STRICT-WINNING SIDE-TIP ACTIVATION ONLY"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19364,
+    "before": "PATCH 08B.4D.9C - STARTUP WINNING-SIDE RECONCILIATION",
+    "after": "STARTUP WINNING-SIDE RECONCILIATION"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19733,
+    "before": "Patch 08B.4D.1 v1a: submitBlockInternal still owns miningSubmitMutex.",
+    "after": "submitBlockInternal still owns miningSubmitMutex."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19747,
+    "before": "Patch 08B.4D.3 v1b: post-connect maintenance only.",
+    "after": "post-connect maintenance only."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19766,
+    "before": "Patch 08B.4D.9B: only a freshly accepted/persisted side tip can enter",
+    "after": "only a freshly accepted/persisted side tip can enter"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 19796,
+    "before": "TRU Security Patch 08A v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20374,
+    "before": "TRU Security Patch 07:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20410,
+    "before": "FIX(patch47): size-aware block assembly.  Do not blindly copy the whole",
+    "after": "size-aware block assembly.  Do not blindly copy the whole"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20441,
+    "before": "FIX(patch47): final hard stop after metadata expansion.  Never waste GPU",
+    "after": "final hard stop after metadata expansion.  Never waste GPU"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20746,
+    "before": "FIX(patch35): roll a per-attempt extraNonce into the coinbase so each",
+    "after": "roll a per-attempt extraNonce into the coinbase so each"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20767,
+    "before": "FIX(patch47): size-aware block assembly.  Do not blindly copy the whole",
+    "after": "size-aware block assembly.  Do not blindly copy the whole"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 20805,
+    "before": "FIX(patch47): final hard stop after metadata expansion.  Never mine a",
+    "after": "final hard stop after metadata expansion.  Never mine a"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21100,
+    "before": "FIX(patch8): match new starting difficulty",
+    "after": "match new starting difficulty"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21121,
+    "before": "TRU Security Patch 08A v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21250,
+    "before": "TRU Security Patch 09: rebuild cumulative uint256 work every restart.",
+    "after": "rebuild cumulative uint256 work every restart."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21298,
+    "before": "TRU Security Patch 08A v4: repair the active tip BEFORE side reload.",
+    "after": "repair the active tip BEFORE side reload."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21426,
+    "before": "Patch 08B.3T v2: persist the current active-tip height mapping in the",
+    "after": "persist the current active-tip height mapping in the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21523,
+    "before": "Patch 08B.4A.1: stage dirty block records, but DO NOT clear isDirty",
+    "after": "stage dirty block records, but DO NOT clear isDirty"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21552,
+    "before": "Patch 08B.4A.1: consensus/durability state must not outlive stack",
+    "after": "consensus/durability state must not outlive stack"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21636,
+    "before": "Patch 08B.4A.1a v2: never read/save chain state without owning mtx.",
+    "after": "never read/save chain state without owning mtx."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21905,
+    "before": "Patch 15A v1c: fail closed unless genesis is actually durable.",
+    "after": "fail closed unless genesis is actually durable."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 21947,
+    "before": "TRU Security Patch 10: bound attacker-controlled work BEFORE a transaction",
+    "after": "bound attacker-controlled work BEFORE a transaction"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22357,
+    "before": "Patch 20: the canonical 4-byte Unix timestamp is little-endian.",
+    "after": "the canonical 4-byte Unix timestamp is little-endian."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22416,
+    "before": "FIX(patch51): iteratePrefix() already removed the",
+    "after": "iteratePrefix() already removed the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22516,
+    "before": "FIX(patch49): derive the ADDRESS from the index key instead of",
+    "after": "derive the ADDRESS from the index key instead of"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22571,
+    "before": "FIX(patch49): price each address ONCE. The old loop called",
+    "after": "price each address ONCE. The old loop called"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22576,
+    "before": "FIX(patch49): read txCount with the SAME API applyBlock writes",
+    "after": "read txCount with the SAME API applyBlock writes"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22593,
+    "before": "FIX(patch49): calculate_balance() returns TRU ATOMS. The old code",
+    "after": "calculate_balance() returns TRU ATOMS. The old code"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 22614,
+    "before": "PATCH 05 — PUBLIC WEB RPC GATEWAY",
+    "after": "PUBLIC WEB RPC GATEWAY"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23032,
+    "before": "FIX(patch49): normalise the tokenUTXO key the same",
+    "after": "normalise the tokenUTXO key the same"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23053,
+    "before": "FIX(patch49): two bugs here.",
+    "after": "two bugs here."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23103,
+    "before": "FIX(patch51): iteratePrefix() already stripped the",
+    "after": "iteratePrefix() already stripped the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23151,
+    "before": "FIX(patch49): honour ?address=. script.js calls",
+    "after": "honour ?address=. script.js calls"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23310,
+    "before": "Compute confirmations if you have best tip height handy",
+    "after": "Compute confirmations from the best-tip height."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23429,
+    "before": "FIX(patch49): resolve metadata current-first, issuance-second.",
+    "after": "resolve metadata current-first, issuance-second."
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23483,
+    "before": "FIX(patch49): honour ?address=. script.js calls",
+    "after": "honour ?address=. script.js calls"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 23873,
+    "before": "FIX(patch51): iteratePrefix() already stripped the",
+    "after": "iteratePrefix() already stripped the"
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 24954,
+    "before": "TRU Security Patch 12C.3b v2:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.cpp",
+    "line": 24962,
+    "before": "Optional: Broadcast to peers if you have P2P enabled",
+    "after": "Broadcast to connected peers when P2P is enabled."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 9,
+    "before": "TRU Security Patch 10: queued-tx deduplication",
+    "after": "queued-tx deduplication"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 30,
+    "before": "Patch 08B.4D.9A: fail-stop shutdown bridge",
+    "after": "fail-stop shutdown bridge"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 31,
+    "before": "TRU Security Patch 09: 256-bit chainwork",
+    "after": "256-bit chainwork"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 113,
+    "before": "TRU Security Patch 10: bounded ingress queue",
+    "after": "bounded ingress queue"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 134,
+    "before": "Patch 08B.4B.1 v2: optional marker is published atomically with active-tip",
+    "after": "optional marker is published atomically with active-tip"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 269,
+    "before": "Patch 08B.3c: local 08B.3T test hooks are compile-time excluded by default.",
+    "after": "local 08B.3T test hooks are compile-time excluded by default."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 281,
+    "before": "Patch 08B.4A: development-only inspection of the production reorg",
+    "after": "development-only inspection of the production reorg"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 284,
+    "before": "Patch 08B.4D.2T v1: DEV-only controlled side-pressure fixture.",
+    "after": "DEV-only controlled side-pressure fixture."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 287,
+    "before": "Patch 08B.4D.4T v1a: DEV-only bounded positive-cache FIFO fixture.",
+    "after": "DEV-only bounded positive-cache FIFO fixture."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 290,
+    "before": "Patch 08B.4D.5T v1c: DEV-only immutable negative-cache FIFO fixture.",
+    "after": "DEV-only immutable negative-cache FIFO fixture."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 298,
+    "before": "Patch 08B.4B.1 v2: development-only MANUAL executor. It can run only",
+    "after": "development-only MANUAL executor. It can run only"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 312,
+    "before": "Patch 08B.4D.9A: production activation plumbing only. The gate is",
+    "after": "production activation plumbing only. The gate is"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 319,
+    "before": "Patch 08B.4D.9C: startup-only reconciliation. Main calls this after the",
+    "after": "startup-only reconciliation. Main calls this after the"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 346,
+    "before": "TRU Security Patch 06: submitBlock() is the sole PUBLIC block",
+    "after": "submitBlock() is the sole PUBLIC block"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 354,
+    "before": "TRU Security Patch 08A v4: bounded side-chain/fork scaffolding.",
+    "after": "bounded side-chain/fork scaffolding."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 361,
+    "before": "Patch 08B.4D.2 v1: caller MUST already own miningSubmitMutex.",
+    "after": "caller MUST already own miningSubmitMutex."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 371,
+    "before": "Patch 08B.4D.1 v1a: caller MUST already own miningSubmitMutex.",
+    "after": "caller MUST already own miningSubmitMutex."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 374,
+    "before": "Patch 08B.4D.3 v1b: active-chain U4 retention core.",
+    "after": "active-chain U4 retention core."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 386,
+    "before": "Patch 08B.3 v2: reconstruct the fork-point state inside an isolated",
+    "after": "reconstruct the fork-point state inside an isolated"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 397,
+    "before": "Patch 08B.4A v2: optional reorgMarkerPayload plumbing remains available",
+    "after": "optional reorgMarkerPayload plumbing remains available"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 417,
+    "before": "TRU Security Patch 08B.4A v2: durable reorganization planning/preflight.",
+    "after": "durable reorganization planning/preflight."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 464,
+    "before": "Patch 08B.4D.4 v1b: bounded in-memory POSITIVE",
+    "after": "bounded in-memory POSITIVE"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 483,
+    "before": "Patch 08B.4D.5 v1b: bounded in-memory IMMUTABLE-REJECT cache.",
+    "after": "bounded in-memory IMMUTABLE-REJECT cache."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 494,
+    "before": "Patch 08B.4D.6 v1: per-authoritative-side-source budget for the",
+    "after": "per-authoritative-side-source budget for the"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 510,
+    "before": "Patch 08B.4B.1 v2: controlled/manual executor core. Crash recovery of an",
+    "after": "controlled/manual executor core. Crash recovery of an"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 532,
+    "before": "Patch 08B.4C.1 v2: authenticated restart classification only.",
+    "after": "authenticated restart classification only."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 572,
+    "before": "Patch 08B.4D.9A: normal-context bridge for a future 9B partial-mutation",
+    "after": "normal-context bridge for a future 9B partial-mutation"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 578,
+    "before": "Patch 08B.4D.9B: called only after a side block has been fully accepted",
+    "after": "called only after a side block has been fully accepted"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 585,
+    "before": "TRU Security Patch 10: bounded pre-validation transaction queue.",
+    "after": "bounded pre-validation transaction queue."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 604,
+    "before": "TRU Security Patch 08A v4:",
+    "after": ""
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 610,
+    "before": "TRU Security Patch 12C.3b: bounded resource ownership for untrusted",
+    "after": "bounded resource ownership for untrusted"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 625,
+    "before": "Patch 08B.4B.1 v2: if a manually-gated execution fails after the first",
+    "after": "if a manually-gated execution fails after the first"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 630,
+    "before": "Patch 08B.4D.9A: installed by main before network activity. The callback",
+    "after": "installed by main before network activity. The callback"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 667,
+    "before": "Patch 08B.4D.4 v1b: memory-only positive validation cache.",
+    "after": "memory-only positive validation cache."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 680,
+    "before": "Patch 08B.4D.5 v1b: process-local immutable negative cache.",
+    "after": "process-local immutable negative cache."
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 693,
+    "before": "Patch 08B.4D.6 v1: bounded process-local token buckets keyed by the",
+    "after": "bounded process-local token buckets keyed by the"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 705,
+    "before": "Patch 08B.4D.7 v1: one aggregate untrusted-source token bucket shares",
+    "after": "one aggregate untrusted-source token bucket shares"
+  },
+  {
+    "file": "src/blockchain.h",
+    "line": 716,
+    "before": "Patch 08B.3b: token/application serialization is per-chain instance so an",
+    "after": "token/application serialization is per-chain instance so an"
+  },
+  {
+    "file": "src/contract_call_envelope.h",
+    "line": 11,
+    "before": "TRU Smart Contract Patch 14D2D — canonical state-call commitment envelope.",
+    "after": "canonical state-call commitment envelope."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 16,
+    "before": "Patch 14D2C: creation init envelope primitives",
+    "after": "creation init envelope primitives"
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 17,
+    "before": "Patch 14D2D: signed call-argument commitment",
+    "after": "signed call-argument commitment"
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 19,
+    "before": "TRU Smart Contract Patch 14D2 — canonical state-anchor call policy.",
+    "after": "canonical state-anchor call policy."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 49,
+    "before": "Patch 21: Contract Vault classification uses the same push-aware walk.",
+    "after": "Contract Vault classification uses the same push-aware walk."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 322,
+    "before": "Patch 14D3A — first activated stateful family: Stateful K/V V1.",
+    "after": "first activated stateful family: Stateful K/V V1."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 634,
+    "before": "Patch 21 — shared structural classifiers for read-side/explorer identity.",
+    "after": "shared structural classifiers for read-side/explorer identity."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 914,
+    "before": "Patch 15A — canonical Voting V1 initialization schema.",
+    "after": "canonical Voting V1 initialization schema."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 983,
+    "before": "Patch 15B — canonical Token Issuer V1 initialization schema.",
+    "after": "canonical Token Issuer V1 initialization schema."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 1003,
+    "before": "Patch 16 — pin the family-level serialization order in addition to the",
+    "after": "pin the family-level serialization order in addition to the"
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 1175,
+    "before": "Patch 14D3B: a continuation call also creates one canonical f751 output,",
+    "after": "a continuation call also creates one canonical f751 output,"
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 1189,
+    "before": "Patch 14D3A2: owner identity is bound to the sole funding input.",
+    "after": "owner identity is bound to the sole funding input."
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 1288,
+    "before": "Patch 14D3A2 — canonical owner identity extracted from a standard P2PKH",
+    "after": "canonical owner identity extracted from a standard P2PKH"
+  },
+  {
+    "file": "src/contract_call_policy.h",
+    "line": 1404,
+    "before": "Patch 15B — structural economic-call-value rule. No activated V1",
+    "after": "structural economic-call-value rule. No activated V1"
+  },
+  {
+    "file": "src/contract_state_init_envelope.h",
+    "line": 13,
+    "before": "TRU Smart Contract Patch 14D2C — canonical state-init envelope primitives.",
+    "after": "canonical state-init envelope primitives."
+  },
+  {
+    "file": "src/contract_state_limits.h",
+    "line": 11,
+    "before": "TRU Smart Contract Patch 14D2B — genesis contract-state resource policy.",
+    "after": "genesis contract-state resource policy."
+  },
+  {
+    "file": "src/contract_state_lineage.h",
+    "line": 7,
+    "before": "Patch 14D2B: shared state-key limits",
+    "after": "shared state-key limits"
+  },
+  {
+    "file": "src/contract_state_lineage.h",
+    "line": 9,
+    "before": "TRU Smart Contract Patch 14D1 — stable state-domain / lineage key primitives.",
+    "after": "stable state-domain / lineage key primitives."
+  },
+  {
+    "file": "src/contract_state_lineage.h",
+    "line": 126,
+    "before": "Patch 14D3A2 — durable owner binding for owner-authorized V1 calls.",
+    "after": "durable owner binding for owner-authorized V1 calls."
+  },
+  {
+    "file": "src/contract_state_lineage.h",
+    "line": 135,
+    "before": "Patch 15A — immutable activated contract-family registry. Existing",
+    "after": "immutable activated contract-family registry. Existing"
+  },
+  {
+    "file": "src/contract_state_runtime.h",
+    "line": 20,
+    "before": "TRU Smart Contract Patch 14D3B — confirmed state-domain loader +",
+    "after": "confirmed state-domain loader +"
+  },
+  {
+    "file": "src/contract_state_runtime.h",
+    "line": 150,
+    "before": "Patch 15B: existing K/V roots predate the immutable family registry and",
+    "after": "existing K/V roots predate the immutable family registry and"
+  },
+  {
+    "file": "src/contract_state_runtime.h",
+    "line": 617,
+    "before": "Patch 17 — bind countN, totalvotes and voted:<hash160> to the same",
+    "after": "bind countN, totalvotes and voted:<hash160> to the same"
+  },
+  {
+    "file": "src/contract_state_runtime.h",
+    "line": 672,
+    "before": "Patch 15B — validate the complete authoritative Token Issuer V1 state.",
+    "after": "validate the complete authoritative Token Issuer V1 state."
+  },
+  {
+    "file": "src/contract_state_runtime.h",
+    "line": 755,
+    "before": "Patch 16 — exact persistent issuance delta. A purchase may create a new",
+    "after": "exact persistent issuance delta. A purchase may create a new"
+  },
+  {
+    "file": "src/crypto_ecdsa.cpp",
+    "line": 729,
+    "before": "TRU Security Patch 11: fixed-K/MagicLock signatures are normalized too.",
+    "after": "fixed-K/MagicLock signatures are normalized too."
+  },
+  {
+    "file": "src/crypto_ecdsa.h",
+    "line": 55,
+    "before": "TRU Security Patch 11: transaction-signature canonicality.",
+    "after": "transaction-signature canonicality."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 21,
+    "before": "Patch 08B.4D.4 v1b - per-LevelDB-path logical mutation generation",
+    "after": "per-LevelDB-path logical mutation generation"
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 151,
+    "before": "Patch 08B.3b: serialize only slow open/close lifecycle work. The normal",
+    "after": "serialize only slow open/close lifecycle work. The normal"
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 394,
+    "before": "Patch 08B.3 v2: historical undo journals dominate sandbox copy",
+    "after": "historical undo journals dominate sandbox copy"
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 472,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 490,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 555,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 595,
+    "before": "Patch 08B.4D.4 v1b: repair can rewrite logical state outside",
+    "after": "repair can rewrite logical state outside"
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 622,
+    "before": "Patch 08B.3a: snapshot matching entries while holding the lifetime-safe",
+    "after": "snapshot matching entries while holding the lifetime-safe"
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 696,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 728,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 827,
+    "before": "Patch 08B.4D.4 v1b: successful logical DB mutation.",
+    "after": "successful logical DB mutation."
+  },
+  {
+    "file": "src/leveldb_storage.cpp",
+    "line": 962,
+    "before": "Patch 08B.3a: migrate only after releasing the per-DB mutex; putContract()",
+    "after": "migrate only after releasing the per-DB mutex; putContract()"
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 22,
+    "before": "Patch 08B.1: exact on-disk read for durable undo pre-images.",
+    "after": "exact on-disk read for durable undo pre-images."
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 26,
+    "before": "Patch 08B.3: create a consistent raw-key snapshot in another LevelDB.",
+    "after": "create a consistent raw-key snapshot in another LevelDB."
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 45,
+    "before": "Patch 08B.3b: live-state callers keep durable sync=true by default.",
+    "after": "live-state callers keep durable sync=true by default."
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 49,
+    "before": "Patch 08B.4D.4 v1b: process-local, per-database-path",
+    "after": "process-local, per-database-path"
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 74,
+    "before": "Patch 08B.3b: the shared registry owns the custom LevelDB block cache so",
+    "after": "the shared registry owns the custom LevelDB block cache so"
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 77,
+    "before": "Patch 08B.3a: shared ownership prevents erase from destroying a mutex",
+    "after": "shared ownership prevents erase from destroying a mutex"
+  },
+  {
+    "file": "src/leveldb_storage.h",
+    "line": 85,
+    "before": "Patch 08B.3a: copy a lifetime-safe per-path mutex handle while holding",
+    "after": "copy a lifetime-safe per-path mutex handle while holding"
+  },
+  {
+    "file": "src/logging.h",
+    "line": 14,
+    "before": "Call this once, near the start of main(), with your chosen filename.",
+    "after": "Initialize logging once near the start of main()."
+  },
+  {
+    "file": "src/logging.h",
+    "line": 17,
+    "before": "Close the log on exit if you want:",
+    "after": "Close the log during shutdown."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 14,
+    "before": "Patch 05: RPC transport authentication",
+    "after": "RPC transport authentication"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 37,
+    "before": "TRU CLI UX PATCH 30B5D — vendor-neutral GPU discovery uses the same",
+    "after": "vendor-neutral GPU discovery uses the same"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 71,
+    "before": "FIX(patch36): waitpid for spawned miner processes",
+    "after": "waitpid for spawned miner processes"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 72,
+    "before": "FIX(patch36): open() for miner log redirect",
+    "after": "open() for miner log redirect"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 77,
+    "before": "Patch 14D3A: Stateful K/V V1 creation",
+    "after": "Stateful K/V V1 creation"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 78,
+    "before": "Patch 14D3B: stable root/live/owner call resolution",
+    "after": "stable root/live/owner call resolution"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 79,
+    "before": "Patch 15A1: shared confirmed-state/Voting runtime helpers",
+    "after": "shared confirmed-state/Voting runtime helpers"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 96,
+    "before": "TRU CLI UX PATCH 30B5D — OPENCL GPU DISCOVERY",
+    "after": "OPENCL GPU DISCOVERY"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 266,
+    "before": "TRU CLI UX PATCH 30A v3 — explicit terminal ownership.",
+    "after": "explicit terminal ownership."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 287,
+    "before": "TRU CLI UX PATCH 30B4 — RESULT / APPEND / PROMPT OWNERSHIP",
+    "after": "RESULT / APPEND / PROMPT OWNERSHIP"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 303,
+    "before": "TRU CLI UX PATCH 30B5A — background sync owns a dedicated status lane.",
+    "after": "background sync owns a dedicated status lane."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 309,
+    "before": "TRU CLI UX PATCH 30B5B — fixed three-line footer stack.",
+    "after": "fixed three-line footer stack."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 329,
+    "before": "TRU CLI UX PATCH 30B5 — nested questions must remain in the user's visual",
+    "after": "nested questions must remain in the user's visual"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 590,
+    "before": "TRU CLI UX PATCH 30B5E — progressive workflows already own visible",
+    "after": "progressive workflows already own visible"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 612,
+    "before": "TRU CLI UX PATCH 30B3 — SHARED EXACT TRU AMOUNTS",
+    "after": "SHARED EXACT TRU AMOUNTS"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 723,
+    "before": "Patch 08B.4A.1b v2: POSIX signal handlers remain async-signal-safe.",
+    "after": "POSIX signal handlers remain async-signal-safe."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 747,
+    "before": "Patch 08B.4D.9A: normal C++ execution-context bridge for a future",
+    "after": "normal C++ execution-context bridge for a future"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 933,
+    "before": "TRU CLI UX PATCH 30A v3: every signal-aware input path owns the cursor",
+    "after": "every signal-aware input path owns the cursor"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 999,
+    "before": "TRU CLI UX PATCH 30A v2: row 16 is the normal-mode status lane.",
+    "after": "row 16 is the normal-mode status lane."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 1106,
+    "before": "Patch 17 — canonical reader only. Voting results are derived from the",
+    "after": "canonical reader only. Voting results are derived from the"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 1232,
+    "before": "Patch 16 — Token Issuer V1 reads use the canonical root-scoped LevelDB",
+    "after": "Token Issuer V1 reads use the canonical root-scoped LevelDB"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 1427,
+    "before": "TRU CLI UX PATCH 30A6 — restore the original TRU spinner identity while",
+    "after": "restore the original TRU spinner identity while"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 1501,
+    "before": "TRU CLI UX PATCH 30C — TRANSACTION RECEIPTS",
+    "after": "TRANSACTION RECEIPTS"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 1921,
+    "before": "--- Oobabooga config (defaults to your local flags) ---",
+    "after": "Oobabooga configuration defaults."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 3202,
+    "before": "FIX(patch56-confirmed-token-index): tokenUTXO is a derived",
+    "after": "tokenUTXO is a derived"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 3460,
+    "before": "Patch 19B: contract listing follows the same alternate-buffer ownership",
+    "after": "contract listing follows the same alternate-buffer ownership"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 3863,
+    "before": "FIX(patch56-confirmed-token-index): debug view must also",
+    "after": "debug view must also"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4207,
+    "before": "TRU CLI UX PATCH 30A v3 — no-flicker header repaint.",
+    "after": "no-flicker header repaint."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4226,
+    "before": "TRU CLI UX PATCH 30A4: clean stale full-screen instructions above the",
+    "after": "clean stale full-screen instructions above the"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4249,
+    "before": "FIX(patch41): build ALL lines as one atomic string and clear each",
+    "after": "build ALL lines as one atomic string and clear each"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4278,
+    "before": "FIX(patch36): external miner process manager.",
+    "after": "external miner process manager."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4338,
+    "before": "FIX(patch37): live miner-stats banner rendered in the node's own TUI.",
+    "after": "live miner-stats banner rendered in the node's own TUI."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4375,
+    "before": "FIX(patch39): only show the banner while mining is actually running.",
+    "after": "only show the banner while mining is actually running."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4379,
+    "before": "FIX(patch46-fixed): do NOT erase rows 9..19 on every CLI loop.",
+    "after": "do NOT erase rows 9..19 on every CLI loop."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4396,
+    "before": "TRU CLI UX PATCH 30A v2: rich neon dashboard owns rows 9..15 only.",
+    "after": "rich neon dashboard owns rows 9..15 only."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4475,
+    "before": "FIX(patch46-fixed): stable responsive menu.",
+    "after": "stable responsive menu."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4512,
+    "before": "TRU Smart Contract Patch 20B — Time Lock command discoverability.",
+    "after": "Time Lock command discoverability."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4565,
+    "before": "TRU CLI UX PATCH 30A4a: box-drawing glyphs are UTF-8 strings, not",
+    "after": "box-drawing glyphs are UTF-8 strings, not"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4573,
+    "before": "TRU CLI UX PATCH 30A4b: keep the frame rails purple but promote the",
+    "after": "keep the frame rails purple but promote the"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4604,
+    "before": "TRU CLI UX PATCH 30A4c: section names may be centered anywhere in",
+    "after": "section names may be centered anywhere in"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4672,
+    "before": "TRU CLI UX PATCH 30A4 — neon hierarchy + aligned Command Deck.",
+    "after": "neon hierarchy + aligned Command Deck."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4674,
+    "before": "TRU CLI UX PATCH 30A5 — sequential public CLI navigation.",
+    "after": "sequential public CLI navigation."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 4951,
+    "before": "TRU CLI UX PATCH 30A v2:",
+    "after": ""
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5039,
+    "before": "Patch 08B.3T v2: hidden LOCAL-CLI-only runtime test commands.",
+    "after": "hidden LOCAL-CLI-only runtime test commands."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5040,
+    "before": "Patch 08B.3c: this parser is absent from production builds by default.",
+    "after": "this parser is absent from production builds by default."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5089,
+    "before": "Patch 08B.4D.4T v1a: hidden LOCAL-CLI-only positive-cache FIFO fixture.",
+    "after": "hidden LOCAL-CLI-only positive-cache FIFO fixture."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5092,
+    "before": "Patch 08B.4D.5T v1c: hidden LOCAL-CLI-only immutable negative-cache FIFO fixture.",
+    "after": "hidden LOCAL-CLI-only immutable negative-cache FIFO fixture."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5153,
+    "before": "Patch 08B.4D.2T v1b: hidden LOCAL-CLI-only pressure fixture.",
+    "after": "hidden LOCAL-CLI-only pressure fixture."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5244,
+    "before": "TRU CLI UX PATCH 30A5 — public sequential navigation adapter.",
+    "after": "public sequential navigation adapter."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5508,
+    "before": "FIX(patch36): CPU mining submenu -> spawn standalone tru_miner_cpu.",
+    "after": "CPU mining submenu -> spawn standalone tru_miner_cpu."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5513,
+    "before": "TRU CLI UX PATCH 30B5C — mining submenu is owned result content.",
+    "after": "mining submenu is owned result content."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5567,
+    "before": "FIX(patch36): GPU mining submenu -> spawn standalone tru_miner.",
+    "after": "GPU mining submenu -> spawn standalone tru_miner."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 5570,
+    "before": "TRU CLI UX PATCH 30B5C — keep all GPU submenu choices inside",
+    "after": "keep all GPU submenu choices inside"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 6166,
+    "before": "patch 7: also pin the failure as a sticky notice so it isn't",
+    "after": "also pin the failure as a sticky notice so it isn't"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 6435,
+    "before": "Direct call to your handlers (defined in your codebase)",
+    "after": "Invoke the registered handlers."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 7382,
+    "before": "Patch 20 v2: show the consensus maturity clock before the",
+    "after": "show the consensus maturity clock before the"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 7554,
+    "before": "TRU Smart Contract Patch 07 — Oracle threshold numeric encoding.",
+    "after": "Oracle threshold numeric encoding."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 7581,
+    "before": "Patch 15B — Token Issuer V1 creation uses the same proven",
+    "after": "Token Issuer V1 creation uses the same proven"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 7898,
+    "before": "Patch 15A — Voting V1 uses the proven canonical f751",
+    "after": "Voting V1 uses the proven canonical f751"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8096,
+    "before": "(Pick your convention; below we mirror TOKEN ISSUER style but for foreign->TRU)",
+    "after": "Use token-issuer conventions for foreign-chain to TRU transfers."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8142,
+    "before": "confirm/redeem/verify opcodes can run on later calls (your opcode impls handle state).",
+    "after": "Confirm, redeem, and verify opcodes handle state on subsequent calls."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8150,
+    "before": "Address generation gate (idempotent in your opcode impl):",
+    "after": "Idempotent address-generation gate."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8176,
+    "before": "You already have contractAmount from earlier prompt in the 18 menu",
+    "after": "Use contractAmount from the earlier menu prompt."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8281,
+    "before": "Patch 14D3A: creation state is NOT executable locking code.",
+    "after": "creation state is NOT executable locking code."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 8330,
+    "before": "Patch 14D3A — canonical one-time Stateful K/V initialization.",
+    "after": "canonical one-time Stateful K/V initialization."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 9642,
+    "before": "Patch 15B — canonical Token Issuer V1 payable continuation.",
+    "after": "canonical Token Issuer V1 payable continuation."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10022,
+    "before": "Patch 16 — UI arithmetic mirrors checked V1 multiplication.",
+    "after": "UI arithmetic mirrors checked V1 multiplication."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10045,
+    "before": "Patch 16C v2 — displayOutput() clears the output region on each",
+    "after": "displayOutput() clears the output region on each"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10062,
+    "before": "Patch 16B — Blockchain::getContracts() returns a wrapper object",
+    "after": "Blockchain::getContracts() returns a wrapper object"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10374,
+    "before": "TRU CLI UX PATCH 30A v3: M/C restore the logo with an absolute",
+    "after": "M/C restore the logo with an absolute"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10388,
+    "before": "TRU CLI UX PATCH 30A6: restore the original Matrix-rain clear.",
+    "after": "restore the original Matrix-rain clear."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10822,
+    "before": "Patch 05: non-loopback privileged RPC requires explicit operator opt-in.",
+    "after": "non-loopback privileged RPC requires explicit operator opt-in."
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10918,
+    "before": "Patch 05: authenticated privileged RPC boundary. Authentication is",
+    "after": "authenticated privileged RPC boundary. Authentication is"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10958,
+    "before": "Patch 08B.4D.9A: install fail-stop plumbing before the node is exposed",
+    "after": "install fail-stop plumbing before the node is exposed"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 10969,
+    "before": "Patch 08B.4D.9C: reconcile a persisted strict-winning side tip before",
+    "after": "reconcile a persisted strict-winning side tip before"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 11334,
+    "before": "TRU CLI UX PATCH 30B5: background synchronization must never",
+    "after": "background synchronization must never"
+  },
+  {
+    "file": "src/main.cpp",
+    "line": 11620,
+    "before": "Patch 08B.4A.1a v2: synchronous shutdown saves with bounded retries.",
+    "after": "synchronous shutdown saves with bounded retries."
+  },
+  {
+    "file": "src/main_ai_integration.cpp",
+    "line": 84,
+    "before": "Patch 18: AI routing is off-chain and must never invoke the",
+    "after": "AI routing is off-chain and must never invoke the"
+  },
+  {
+    "file": "src/master_bridge.h",
+    "line": 14,
+    "before": "Optional if you use it in your switch:",
+    "after": "Optional switch integration."
+  },
+  {
+    "file": "src/master_bridge.h",
+    "line": 26,
+    "before": "Optional if you use it in your switch:",
+    "after": "Optional switch integration."
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 2,
+    "before": "TRU Security Patch 10: shared money/mempool limits",
+    "after": "shared money/mempool limits"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 13,
+    "before": "Patch 14B: shared execution context",
+    "after": "shared execution context"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 15,
+    "before": "Patch 14D3B: confirmed state snapshot + scratch execution",
+    "after": "confirmed state snapshot + scratch execution"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 17,
+    "before": "Patch 13A2: explicit OP_RETURN consensus parity",
+    "after": "explicit OP_RETURN consensus parity"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 37,
+    "before": "Patch 18: OP_DATAFEED is a deterministic consensus opcode, not an AI",
+    "after": "OP_DATAFEED is a deterministic consensus opcode, not an AI"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 412,
+    "before": "Patch 12B v3: reserve one shared validation-work slot BEFORE fee",
+    "after": "reserve one shared validation-work slot BEFORE fee"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 795,
+    "before": "Patch 10: do NOT perform the old O(spent-set * pool * inputs) repair scan",
+    "after": "do NOT perform the old O(spent-set * pool * inputs) repair scan"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 952,
+    "before": "Patch 14D3A — relay parity for first stateful creation family.",
+    "after": "relay parity for first stateful creation family."
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 985,
+    "before": "TRU Smart Contract Patch 20 v2 — snapshot relay execution context once",
+    "after": "snapshot relay execution context once"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 1058,
+    "before": "Patch 14D3A2 — the sole funding input of a new Stateful K/V",
+    "after": "the sole funding input of a new Stateful K/V"
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 1113,
+    "before": "TRU Smart Contract Patch 13A2 — mempool parity for leading OP_RETURN.",
+    "after": "mempool parity for leading OP_RETURN."
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 1131,
+    "before": "TRU Smart Contract Patch 14D3B — first mutable state activation.",
+    "after": "first mutable state activation."
+  },
+  {
+    "file": "src/mempool.cpp",
+    "line": 1532,
+    "before": "TRU Security Patch 11: one sighash implementation only.",
+    "after": "one sighash implementation only."
+  },
+  {
+    "file": "src/mempool.h",
+    "line": 53,
+    "before": "Patch 18: OP_DATAFEED is no longer overloaded as an AI-request marker.",
+    "after": "OP_DATAFEED is no longer overloaded as an AI-request marker."
+  },
+  {
+    "file": "src/mempool.h",
+    "line": 59,
+    "before": "TRU Security Patch 10:",
+    "after": ""
+  },
+  {
+    "file": "src/message_handler.cpp",
+    "line": 732,
+    "before": "TRU Security Patch 06:",
+    "after": ""
+  },
+  {
+    "file": "src/message_handler.cpp",
+    "line": 791,
+    "before": "TRU Security Patch 10: queue admission is bounded and",
+    "after": "queue admission is bounded and"
+  },
+  {
+    "file": "src/message_handler.h",
+    "line": 5,
+    "before": "FIX(patch47): shared P2P payload ceiling",
+    "after": "shared P2P payload ceiling"
+  },
+  {
+    "file": "src/message_handler.h",
+    "line": 18,
+    "before": "TRU Security Patch 12C.1: receive/send ceilings are per message type.",
+    "after": "receive/send ceilings are per message type."
+  },
+  {
+    "file": "src/message_handler.h",
+    "line": 40,
+    "before": "Patch 15B.1: per-connection fail-closed network handshake validation.",
+    "after": "per-connection fail-closed network handshake validation."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 34,
+    "before": "Include your blockchain headers - same as CPU miner",
+    "after": "Shared blockchain headers used by CPU and GPU miners."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 41,
+    "before": "Patch 05: authenticated node RPC",
+    "after": "authenticated node RPC"
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 714,
+    "before": "FIXED: Ultra-Enhanced Modern GPU mining interface with AUTO-TUNING INFO! ⛓️✨",
+    "after": "GPU mining interface with automatic tuning information."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 808,
+    "before": "Update Performance Metrics with AI ENHANCEMENTS!",
+    "after": "Update performance metrics."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1189,
+    "before": "FIX(patch34): lets the progress thread exit when a full nonce sweep",
+    "after": "lets the progress thread exit when a full nonce sweep"
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1416,
+    "before": "FIX(patch32): capture the index ONCE, before any erase,",
+    "after": "capture the index ONCE, before any erase,"
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1475,
+    "before": "FIX(patch32): erase the SAME index captured above; using",
+    "after": "erase the SAME index captured above; using"
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1576,
+    "before": "FIX(patch34): all device workers finished; release the progress thread",
+    "after": "all device workers finished; release the progress thread"
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1890,
+    "before": "FIX(patch48): HTTP 200 does not mean the node accepted the block.",
+    "after": "HTTP 200 does not mean the node accepted the block."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 1989,
+    "before": "Enhanced main function with spectacular AI startup sequence! 🚀",
+    "after": "GPU miner entry point."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 2044,
+    "before": "SPECTACULAR AI STARTUP SEQUENCE! ⛓️",
+    "after": "Startup display."
+  },
+  {
+    "file": "src/my_gpu_miner.cpp",
+    "line": 2086,
+    "before": "SPECTACULAR AI SHUTDOWN SEQUENCE! ⛓️",
+    "after": "Shutdown display."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 29,
+    "before": "Patch 05: authenticated node RPC",
+    "after": "authenticated node RPC"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 272,
+    "before": "Format time duration - FIXED to show milliseconds",
+    "after": "Format time duration — show milliseconds"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 319,
+    "before": "H/s per thread - FIXED",
+    "after": "H/s per thread"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 380,
+    "before": "FIXED: Changed from KH/s to H/s",
+    "after": "Changed from KH/s to H/s"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 437,
+    "before": "Statistics Dashboard - FIXED",
+    "after": "Statistics Dashboard"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 492,
+    "before": "Enhanced progress thread - FIXED to accept blockCount by reference",
+    "after": "Enhanced progress thread — accept blockCount by reference"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 497,
+    "before": "FIX(patch44): real bits",
+    "after": "real bits"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 579,
+    "before": "FIX(patch48): allocation-free variant used by the mining hot loop.",
+    "after": "allocation-free variant used by the mining hot loop."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 624,
+    "before": "Enhanced CPU mining function with accurate hash counting - FIXED to accept blockCount by reference",
+    "after": "Enhanced CPU mining function with accurate hash counting — accept blockCount by reference"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 642,
+    "before": "FIX(patch12): reset only per-attempt solution state.",
+    "after": "reset only per-attempt solution state."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 666,
+    "before": "FIX(patch48): reused stack buffer, see doubleSha256_21E8 overload.",
+    "after": "reused stack buffer, see doubleSha256_21E8 overload."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 675,
+    "before": "FIX(patch48): no per-hash allocation",
+    "after": "no per-hash allocation"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 682,
+    "before": "FIX(patch11): use the canonical PoW comparison. The old loop",
+    "after": "use the canonical PoW comparison. The old loop"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 726,
+    "before": "FIX(patch44): pass real difficulty bits",
+    "after": "pass real difficulty bits"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 822,
+    "before": "Enhanced mining loop with improved keepalive thread - FIXED to accept blockCount by reference",
+    "after": "Enhanced mining loop with improved keepalive thread — accept blockCount by reference"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 835,
+    "before": "FIX(patch12): remember which chain tip the current extraNonce belongs to.",
+    "after": "remember which chain tip the current extraNonce belongs to."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 983,
+    "before": "FIX(patch12): determine whether the node gave us a new chain tip.",
+    "after": "determine whether the node gave us a new chain tip."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 1067,
+    "before": "FIX(patch48): HTTP 200 does NOT mean the node accepted the block.",
+    "after": "HTTP 200 does NOT mean the node accepted the block."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 1127,
+    "before": "FIX(patch12): do not unconditionally reset extraNonce here.",
+    "after": "do not unconditionally reset extraNonce here."
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 1237,
+    "before": "Initialize block count - FIXED",
+    "after": "Initialize block count"
+  },
+  {
+    "file": "src/my_miner.cpp",
+    "line": 1240,
+    "before": "Start mining - FIXED to pass blockCount by reference",
+    "after": "Start mining — pass blockCount by reference"
+  },
+  {
+    "file": "src/oobalooga_ai_.h",
+    "line": 9,
+    "before": "Adjust this include path to wherever your Wallet class lives:",
+    "after": "Wallet interface."
+  },
+  {
+    "file": "src/oobalooga_ai_.h",
+    "line": 15,
+    "before": "from your --api-key",
+    "after": "Local provider API key."
+  },
+  {
+    "file": "src/oobalooga_ai_.h",
+    "line": 131,
+    "before": "---------- top-level issuers using your Wallet ----------",
+    "after": "Wallet-backed token issuers."
+  },
+  {
+    "file": "src/opcodes.h",
+    "line": 136,
+    "before": "Custom \"New Age\" opcodes for your chain",
+    "after": "TRU extended opcodes."
+  },
+  {
+    "file": "src/opcodes.h",
+    "line": 193,
+    "before": "TRU Smart Contract Patch 11C — reserved upgrade NOP space",
+    "after": "reserved upgrade NOP space"
+  },
+  {
+    "file": "src/p2p.cpp",
+    "line": 7,
+    "before": "FIX(patch26): TCP_KEEPIDLE / TCP_KEEPINTVL / TCP_KEEPCNT",
+    "after": "TCP_KEEPIDLE / TCP_KEEPINTVL / TCP_KEEPCNT"
+  },
+  {
+    "file": "src/p2p.cpp",
+    "line": 271,
+    "before": "FIX(patch26): TCP keepalive so a silently-dropped NAT/CGNAT connection",
+    "after": "TCP keepalive so a silently-dropped NAT/CGNAT connection"
+  },
+  {
+    "file": "src/peer_connection.cpp",
+    "line": 280,
+    "before": "FIX(patch47): send() is allowed to write only part of a buffer.  That was",
+    "after": "send() is allowed to write only part of a buffer.  That was"
+  },
+  {
+    "file": "src/peer_connection.cpp",
+    "line": 604,
+    "before": "Patch 15B.1: magic is checked by deserializeMessage().",
+    "after": "magic is checked by deserializeMessage()."
+  },
+  {
+    "file": "src/peer_connection.h",
+    "line": 74,
+    "before": "Patch 15B.1: application messages are forbidden until this peer",
+    "after": "application messages are forbidden until this peer"
+  },
+  {
+    "file": "src/peer_manager.h",
+    "line": 36,
+    "before": "Patch 12C.2: connection admission/abuse controls.",
+    "after": "connection admission/abuse controls."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2,
+    "before": "Patch 05: authenticated RPC transport",
+    "after": "authenticated RPC transport"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4,
+    "before": "FIX(patch47): shared block/template limits",
+    "after": "shared block/template limits"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 21,
+    "before": "Patch 14D2A: stateful creation activation gate",
+    "after": "stateful creation activation gate"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 35,
+    "before": "FIX(patch48): template double-spend guard",
+    "after": "template double-spend guard"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 84,
+    "before": "TRU CLI UX PATCH 30B3 — exact human-TRU JSON amount boundary.",
+    "after": "exact human-TRU JSON amount boundary."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 123,
+    "before": "TRU Smart Contract Patch 12B — RPC / VM parity gate.",
+    "after": "RPC / VM parity gate."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 152,
+    "before": "TRU Smart Contract Patch 14D2A — browser/RPC parity with the native",
+    "after": "browser/RPC parity with the native"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 169,
+    "before": "TRU Smart Contract Patch 13B — creation-time OP_RETURN value policy.",
+    "after": "creation-time OP_RETURN value policy."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 228,
+    "before": "Patch 15C: removed unused duplicate extractP2PKHAddressFromHexCorrect().",
+    "after": "removed unused duplicate extractP2PKHAddressFromHexCorrect()."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2259,
+    "before": "TRU Smart Contract Patch 12B — browser/RPC creation must pass the",
+    "after": "browser/RPC creation must pass the"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2266,
+    "before": "TRU Smart Contract Patch 13B — determine OP_RETURN from bytecode,",
+    "after": "determine OP_RETURN from bytecode,"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2275,
+    "before": "Patch 20 v2: the public RPC Time Lock family is timestamp-only.",
+    "after": "the public RPC Time Lock family is timestamp-only."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2350,
+    "before": "TRU Smart Contract Patch 13B — Output 1 is always the requested",
+    "after": "Output 1 is always the requested"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 2453,
+    "before": "TRU Security Patch 12B: isolate verbose failures per row.",
+    "after": "isolate verbose failures per row."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 3569,
+    "before": "Patch 16A.0: metadata may travel with the unconfirmed",
+    "after": "metadata may travel with the unconfirmed"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 3585,
+    "before": "Patch 16A.0: never delete confirmed token indexes from RPC context.",
+    "after": "never delete confirmed token indexes from RPC context."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 3949,
+    "before": "TRU Smart Contract Patch 13B2 — legacy createsmartcontract RPC removed.",
+    "after": "legacy createsmartcontract RPC removed."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4179,
+    "before": "TRU Security Patch 07:",
+    "after": ""
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4201,
+    "before": "FIX(patch47): size-aware template construction.  Previously the RPC put",
+    "after": "size-aware template construction.  Previously the RPC put"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4209,
+    "before": "TRU Security Patch 10: getblocktemplate is a second line of defense.",
+    "after": "getblocktemplate is a second line of defense."
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4220,
+    "before": "FIX(patch48): test-validate every mempool transaction against the",
+    "after": "test-validate every mempool transaction against the"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4822,
+    "before": "FIX(patch23b): stop at the script field delimiter so trailing",
+    "after": "stop at the script field delimiter so trailing"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 4844,
+    "before": "FIX(patch23b): Wallet::rpcListUnspent() consumes this RPC but does",
+    "after": "Wallet::rpcListUnspent() consumes this RPC but does"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 5408,
+    "before": "Patch 16A.0: confirmed token metadata/index state is created only",
+    "after": "confirmed token metadata/index state is created only"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 6578,
+    "before": "FIXED: Retrieve the stored encryption key from LevelDB",
+    "after": "Retrieve the stored encryption key from LevelDB"
+  },
+  {
+    "file": "src/rpc_server.cpp",
+    "line": 7921,
+    "before": "Patch 05: use the transport helper's length-oblivious comparison so the",
+    "after": "use the transport helper's length-oblivious comparison so the"
+  },
+  {
+    "file": "src/script_context_builder.h",
+    "line": 4,
+    "before": "Patch 14D1: stable lineage/state key primitives",
+    "after": "stable lineage/state key primitives"
+  },
+  {
+    "file": "src/script_context_builder.h",
+    "line": 12,
+    "before": "TRU Smart Contract Patch 14B — shared base execution-context construction.",
+    "after": "shared base execution-context construction."
+  },
+  {
+    "file": "src/script_context_builder.h",
+    "line": 25,
+    "before": "Patch 20 v2: parent-chain MTP for CLTV only",
+    "after": "parent-chain MTP for CLTV only"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 30,
+    "before": "Patch 14D2A: stateful creation activation gate",
+    "after": "stateful creation activation gate"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 31,
+    "before": "Patch 14D2B: consensus state resource bounds",
+    "after": "consensus state resource bounds"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 32,
+    "before": "Patch 14D2B1: canonical state-domain identity",
+    "after": "canonical state-domain identity"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 64,
+    "before": "Patch 18 — external/off-chain data is never a consensus input.",
+    "after": "external/off-chain data is never a consensus input."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 99,
+    "before": "Patch 14B: execHeight is an explicit execution-context field. Height 0",
+    "after": "execHeight is an explicit execution-context field. Height 0"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 136,
+    "before": "TRU Smart Contract Patch 18 — canonical deterministic Oracle Feed V1.",
+    "after": "canonical deterministic Oracle Feed V1."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 250,
+    "before": "Patch 16: OP_MINT_TOKEN remains byte-reserved but unsupported.",
+    "after": "OP_MINT_TOKEN remains byte-reserved but unsupported."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 269,
+    "before": "TRU Smart Contract Patch 14C1 — legacy bridge containment.",
+    "after": "legacy bridge containment."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 378,
+    "before": "TRU Security Patch 12A v2: scan inherited stack exactly once.",
+    "after": "scan inherited stack exactly once."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 400,
+    "before": "TRU Smart Contract Patch 14C — canonical per-contract state namespace.",
+    "after": "canonical per-contract state namespace."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 891,
+    "before": "TRU Security Patch 11: TRU currently supports SIGHASH_ALL only.",
+    "after": "TRU currently supports SIGHASH_ALL only."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 935,
+    "before": "Patch 18: OP_DATAFEED is consensus-owned and is resolved directly from",
+    "after": "OP_DATAFEED is consensus-owned and is resolved directly from"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 956,
+    "before": "Patch 18: OP_EXTERNALDATA has no pluggable consensus callback.",
+    "after": "OP_EXTERNALDATA has no pluggable consensus callback."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1262,
+    "before": "TRU Smart Contract Patch 11A — OP_0 / OP_FALSE.",
+    "after": "OP_0 / OP_FALSE."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1295,
+    "before": "TRU Smart Contract Patch 11B — OP_RESERVED is invalid.",
+    "after": "OP_RESERVED is invalid."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1334,
+    "before": "Patch 20 v2: TRU Time Lock V1 is timestamp-only.",
+    "after": "TRU Time Lock V1 is timestamp-only."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1446,
+    "before": "TRU Smart Contract Patch 04 — OP_ADD uint64 normalization",
+    "after": "OP_ADD uint64 normalization"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1484,
+    "before": "TRU Smart Contract Patch 03 — OP_MUL",
+    "after": "OP_MUL"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1522,
+    "before": "TRU Smart Contract Patch 06 — OP_LESSTHAN",
+    "after": "OP_LESSTHAN"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1556,
+    "before": "TRU Smart Contract Patch 08 — OP_GREATERTHAN",
+    "after": "OP_GREATERTHAN"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1590,
+    "before": "TRU Smart Contract Patch 18 — inclusive numeric comparisons.",
+    "after": "inclusive numeric comparisons."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1628,
+    "before": "TRU Smart Contract Patch 02 — OP_VERIFY",
+    "after": "OP_VERIFY"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 1654,
+    "before": "TRU Smart Contract Patch 01 — OP_EQUAL",
+    "after": "OP_EQUAL"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2010,
+    "before": "Patch 18: external/off-chain values are not deterministic",
+    "after": "external/off-chain values are not deterministic"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2026,
+    "before": "Patch 18: one deterministic consensus feed path.",
+    "after": "one deterministic consensus feed path."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2132,
+    "before": "TRU Smart Contract Patch 14C2 — defense-in-depth bridge kill switch.",
+    "after": "defense-in-depth bridge kill switch."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2231,
+    "before": "TRU Smart Contract Patch 11C — reserved upgrade NOP space.",
+    "after": "reserved upgrade NOP space."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2310,
+    "before": "TRU Smart Contract Patch 09 — OP_CAT",
+    "after": "OP_CAT"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2350,
+    "before": "TRU Smart Contract Patch 10 — correct OP_LEFT opcode binding.",
+    "after": "correct OP_LEFT opcode binding."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2420,
+    "before": "Patch 16 — preflight both duplicated items before any",
+    "after": "preflight both duplicated items before any"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2461,
+    "before": "Patch 16 — fail closed. The legacy opcode used",
+    "after": "fail closed. The legacy opcode used"
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2573,
+    "before": "TRU Smart Contract Patch 05 — canonical final truth test.",
+    "after": "canonical final truth test."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2627,
+    "before": "TRU Smart Contract Patch 12 — compiler/VM parity.",
+    "after": "compiler/VM parity."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2647,
+    "before": "Patch 16: OP_MINT_TOKEN is byte-reserved but not text-compilable.",
+    "after": "OP_MINT_TOKEN is byte-reserved but not text-compilable."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2736,
+    "before": "TRU Smart Contract Patch 12 — creation-time consensus parity.",
+    "after": "creation-time consensus parity."
+  },
+  {
+    "file": "src/script_interpreter.cpp",
+    "line": 2746,
+    "before": "TRU Smart Contract Patch 14D2A — creation/spend activation parity.",
+    "after": "creation/spend activation parity."
+  },
+  {
+    "file": "src/script_interpreter.h",
+    "line": 13,
+    "before": "Patch 20 v2: parent-chain Median-Time-Past (MTP) is a separate",
+    "after": "parent-chain Median-Time-Past (MTP) is a separate"
+  },
+  {
+    "file": "src/script_interpreter.h",
+    "line": 38,
+    "before": "Patch 18: OP_DATAFEED has no pluggable callback. Consensus feed reads",
+    "after": "OP_DATAFEED has no pluggable callback. Consensus feed reads"
+  },
+  {
+    "file": "src/script_interpreter.h",
+    "line": 44,
+    "before": "Patch 18: OP_EXTERNALDATA has no consensus callback and fails closed.",
+    "after": "OP_EXTERNALDATA has no consensus callback and fails closed."
+  },
+  {
+    "file": "src/script_interpreter.h",
+    "line": 62,
+    "before": "TRU Security Patch 12A: deterministic script resource accounting.",
+    "after": "deterministic script resource accounting."
+  },
+  {
+    "file": "src/smart_contract.cpp",
+    "line": 21,
+    "before": "Patch 14B: shared execution context",
+    "after": "shared execution context"
+  },
+  {
+    "file": "src/smart_contract.cpp",
+    "line": 839,
+    "before": "Add this function to smart_contract.cpp",
+    "after": "Smart-contract helper."
+  },
+  {
+    "file": "src/smart_contract.cpp",
+    "line": 848,
+    "before": "Patch 20: retain the legacy API surface, but remove its independent",
+    "after": "retain the legacy API surface, but remove its independent"
+  },
+  {
+    "file": "src/smart_contract.h",
+    "line": 13,
+    "before": "Add this struct definition before the queryContractState function",
+    "after": "Contract-state query result."
+  },
+  {
+    "file": "src/token_evolution.cpp",
+    "line": 667,
+    "before": "FIX(patch21): provenance time is set by TRU, not by the AI model.",
+    "after": "provenance time is set by TRU, not by the AI model."
+  },
+  {
+    "file": "src/token_evolution_cli.cpp",
+    "line": 431,
+    "before": "FIX(patch21): show which state will actually be evolved.",
+    "after": "show which state will actually be evolved."
+  },
+  {
+    "file": "src/tokens.cpp",
+    "line": 164,
+    "before": "FIX(patch28): parse the amount defensively per-record. A single",
+    "after": "parse the amount defensively per-record. A single"
+  },
+  {
+    "file": "src/tokens.cpp",
+    "line": 749,
+    "before": "Add this new function to tokens.cpp",
+    "after": "Token helper."
+  },
+  {
+    "file": "src/tru-cli.cpp",
+    "line": 8,
+    "before": "BUILD (see CMake snippet delivered alongside this file):",
+    "after": "Build target: tru-cli (configured in CMakeLists.txt)."
+  },
+  {
+    "file": "src/tru-cli.cpp",
+    "line": 9,
+    "before": "add_executable(tru-cli src/tru-cli.cpp)",
+    "after": ""
+  },
+  {
+    "file": "src/tru-cli.cpp",
+    "line": 10,
+    "before": "target_link_libraries(tru-cli ...)   # same libs your other tools use",
+    "after": ""
+  },
+  {
+    "file": "src/tru-cli.cpp",
+    "line": 50,
+    "before": "Patch 05: Bearer/cookie RPC authentication",
+    "after": "Bearer/cookie RPC authentication"
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 8,
+    "before": "FIX(patch47): one source of truth for TRU block/network size limits.",
+    "after": "one source of truth for TRU block/network size limits."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 16,
+    "before": "TRU Security Patch 12C.1: P2P framing/request ceilings (NODE POLICY).",
+    "after": "P2P framing/request ceilings (NODE POLICY)."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 32,
+    "before": "TRU Security Patch 12C.2: peer abuse/rate-limit policy (NODE POLICY).",
+    "after": "peer abuse/rate-limit policy (NODE POLICY)."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 61,
+    "before": "TRU Security Patch 12C.3a: locally-owned outstanding block-request bounds.",
+    "after": "locally-owned outstanding block-request bounds."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 70,
+    "before": "TRU Security Patch 12C.3b: untrusted-source side-fork quotas.",
+    "after": "untrusted-source side-fork quotas."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 85,
+    "before": "TRU Security Patch 10: one source of truth for monetary and mempool policy",
+    "after": "one source of truth for monetary and mempool policy"
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 90,
+    "before": "TRU Security Patch 12A: consensus execution/resource ceilings.",
+    "after": "consensus execution/resource ceilings."
+  },
+  {
+    "file": "src/tru_limits.h",
+    "line": 117,
+    "before": "TRU Security Patch 12B: NODE POLICY ONLY, not block consensus.",
+    "after": "NODE POLICY ONLY, not block consensus."
+  },
+  {
+    "file": "src/tru_network_params.h",
+    "line": 11,
+    "before": "Patch 15B.1: immutable mainnet wire identity.",
+    "after": "immutable mainnet wire identity."
+  },
+  {
+    "file": "src/tru_network_params.h",
+    "line": 18,
+    "before": "Patch 15B.2: canonical TRU mainnet service defaults.",
+    "after": "canonical TRU mainnet service defaults."
+  },
+  {
+    "file": "src/tru_network_params.h",
+    "line": 22,
+    "before": "Patch 15A: TRU-specific Base58Check P2PKH namespace.",
+    "after": "TRU-specific Base58Check P2PKH namespace."
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 3,
+    "before": "TRU Security Patch 10: shared MAX_MONEY",
+    "after": "shared MAX_MONEY"
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 29,
+    "before": "TRU Security Patch 10: fee calculation is used by getblocktemplate and",
+    "after": "fee calculation is used by getblocktemplate and"
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 288,
+    "before": "FIX(patch51): the transaction ID must NOT depend on scriptSig.",
+    "after": "the transaction ID must NOT depend on scriptSig."
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 385,
+    "before": "TRU Security Patch 11: one sighash implementation only.",
+    "after": "one sighash implementation only."
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 427,
+    "before": "TRU Security Patch 11:",
+    "after": ""
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 432,
+    "before": "TRU Security Patch 12A:",
+    "after": ""
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 468,
+    "before": "TRU Smart Contract Patch 20C:",
+    "after": ""
+  },
+  {
+    "file": "src/tx.cpp",
+    "line": 582,
+    "before": "TRU Smart Contract Patch 20C:",
+    "after": ""
+  },
+  {
+    "file": "src/utils.cpp",
+    "line": 2,
+    "before": "FIX(patch27): std::getenv",
+    "after": "std::getenv"
+  },
+  {
+    "file": "src/utils.cpp",
+    "line": 185,
+    "before": "Add this helper function above startCLI in main.cpp",
+    "after": "Shared CLI helper."
+  },
+  {
+    "file": "src/utils.cpp",
+    "line": 245,
+    "before": "FIX(patch27): guard against SILENTLY minting a new wallet over an",
+    "after": "guard against SILENTLY minting a new wallet over an"
+  },
+  {
+    "file": "src/utils.h",
+    "line": 125,
+    "before": "extractTargetSmart declaration (if you want it global)",
+    "after": "Shared target extraction helper."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 24,
+    "before": "REPLACE your entire getUTXOsForAddress(...) with this version",
+    "after": "Collect UTXOs owned by an address."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 64,
+    "before": "If you have a helper that decodes address straight from script:",
+    "after": "Reserved fallback: direct script address decoding (not implemented here)."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 66,
+    "before": "Or last-chance fallback if you keep a “tail” heuristic:",
+    "after": "Reserved fallback: script-tail address decoding (not implemented here)."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 504,
+    "before": "TRU Smart Contract Patch 19A — canonical addressless contract UTXOs.",
+    "after": "canonical addressless contract UTXOs."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 590,
+    "before": "FIX(patch50): drop the persisted coinbase flag before address",
+    "after": "drop the persisted coinbase flag before address"
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 635,
+    "before": "FIX(patch50): this function used to fail silently. A UTXO whose",
+    "after": "this function used to fail silently. A UTXO whose"
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 717,
+    "before": "In production, we need to replace this stub with proper cryptographic verification",
+    "after": "Unimplemented cryptographic verification; this stub requires replacement before production use."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 723,
+    "before": "For demonstration purposes we always return true.",
+    "after": "Demonstration stub: verification unconditionally succeeds."
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 750,
+    "before": "FIX(patch23b): fields after parts[2] are persisted metadata",
+    "after": "fields after parts[2] are persisted metadata"
+  },
+  {
+    "file": "src/utxo.cpp",
+    "line": 819,
+    "before": "Patch 08B.3b: validation sandboxes query the copied LevelDB directly and",
+    "after": "validation sandboxes query the copied LevelDB directly and"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 199,
+    "before": "TRU Security Patch 12B.1: size-aware wallet fee compatibility",
+    "after": "size-aware wallet fee compatibility"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 283,
+    "before": "TRU Smart Contract Patch 19 — canonical Hash Lock helpers.",
+    "after": "canonical Hash Lock helpers."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 316,
+    "before": "TRU Smart Contract Patch 20 — canonical Time Lock helper.",
+    "after": "canonical Time Lock helper."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 888,
+    "before": "TRU Security Patch 10 v2: Blockchain::addTransaction() now performs",
+    "after": "Blockchain::addTransaction() now performs"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 3190,
+    "before": "FIX(patch54-safe-spend): apply consensus spendability rules before",
+    "after": "apply consensus spendability rules before"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 3234,
+    "before": "FIX(patch55-standard-tru-utxo): ordinary TRU sends may",
+    "after": "ordinary TRU sends may"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 3287,
+    "before": "FIX(patch55-standard-tru-utxo): defense in depth.",
+    "after": "defense in depth."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 3361,
+    "before": "FIX(patch54-safe-spend): success means accepted by the mempool,",
+    "after": "success means accepted by the mempool,"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 5495,
+    "before": "Patch 20: Time Lock retains a normal P2PKH ownership tail.",
+    "after": "Time Lock retains a normal P2PKH ownership tail."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 6454,
+    "before": "Add this helper function to calculate satNumber correctly",
+    "after": "Calculate the atom ordinal."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 6533,
+    "before": "Patch 12B.1: do not construct a script Patch 12A consensus rejects.",
+    "after": "do not construct a script Patch 12A consensus rejects."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 6810,
+    "before": "FIX(patch54-safe-spend): require validated mempool acceptance before",
+    "after": "require validated mempool acceptance before"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7138,
+    "before": "FIX(patch54-safe-spend): one signature pass is sufficient.",
+    "after": "one signature pass is sufficient."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7141,
+    "before": "FIX(patch54-safe-spend): do NOT mutate confirmed token/UTXO/",
+    "after": "do NOT mutate confirmed token/UTXO/"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7792,
+    "before": "FIX(patch54-safe-spend): tokenUTXO is the authoritative direct",
+    "after": "tokenUTXO is the authoritative direct"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7860,
+    "before": "FIX(patch54-safe-spend): request decoded checksummed payload.",
+    "after": "request decoded checksummed payload."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7881,
+    "before": "FIX(patch54-safe-spend): token transfers use this helper for their",
+    "after": "token transfers use this helper for their"
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 7952,
+    "before": "FIX(patch54-safe-spend): use the direct token UTXO association.",
+    "after": "use the direct token UTXO association."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 8647,
+    "before": "Patch 20: final sequence disables locktime. Use non-final sequence.",
+    "after": "final sequence disables locktime. Use non-final sequence."
+  },
+  {
+    "file": "src/wallet.cpp",
+    "line": 9842,
+    "before": "TRU Smart Contract Patch 17 — fail closed on the pre-V1 wallet builder.",
+    "after": "fail closed on the pre-V1 wallet builder."
+  },
+  {
+    "file": "src/wallet.h",
+    "line": 643,
+    "before": "Add this helper if you don't have it already",
+    "after": "Wallet helper declaration."
+  },
+  {
+    "file": "src/wallet_cli.cpp",
+    "line": 181,
+    "before": "4) Show your full‐screen dialog",
+    "after": "4) Show the full-screen dialog."
+  },
+  {
+    "file": "src/wallet_cli.cpp",
+    "line": 192,
+    "before": "returning empty = “all good, we already displayed it”",
+    "after": "An empty result indicates that the dialog already displayed the output."
+  },
+  {
+    "file": "src/wallet_styles.h",
+    "line": 1,
+    "before": "Add this new file: wallet_styles.h",
+    "after": "Wallet presentation styles."
+  }
+]
