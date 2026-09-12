@@ -1,133 +1,252 @@
-# tru-cli + getbalance/getinfo — install guide
+# TRU `tru-cli` — authenticated JSON-RPC command-line client
 
-Two deliverables that together give you a bitcoin-cli-style experience for TRU:
+`tru-cli` is TRU's standalone command-line client for node administration, scripting, diagnostics, wallet reads, mining information, and raw JSON-RPC access.
 
-1. **Patch 31** (`apply_tru_fixes_31.py`) — adds `getbalance` and `getinfo` aggregate RPC methods to the node.
-2. **`tru-cli.cpp`** — a standalone command-line client that talks to the node's JSON-RPC.
+The current TRU source tree already includes:
 
-Both are additive. Patch 31 changes no existing behavior; tru-cli is a brand-new binary. Neither is a consensus change, so this does **not** require a fresh genesis or coordinating the other nodes — it only affects the machine you build it on.
+- the `getbalance` RPC,
+- the `getinfo` aggregate RPC,
+- the `tru-cli` build target,
+- Patch-05 authenticated RPC transport.
+
+No separate Patch 31 installation or manual copy of `tru-cli.cpp` is required for the current release tree.
 
 ---
 
-## Step 1 — Add the two RPC methods (patch 31)
+## Build
 
-```bash
-cd ~/NEW_TRU        # wherever apply_tru_fixes_31.py is
-python3 apply_tru_fixes_31.py --dry-run     # preview
-python3 apply_tru_fixes_31.py               # apply (writes .p31.bak)
-```
-
-Reversible: `python3 apply_tru_fixes_31.py --revert`
-
-This inserts two handlers into `src/rpc_server.cpp` and registers them in the dispatch:
-
-- **`getbalance`** — params `{ "address": "<optional>" }`. With no address it uses the wallet's current address. Returns `{ address, confirmed (8-dp TRU string), satoshis }`. Uses the node's own `calculate_balance()`, so it matches every other balance readout, and formats TRU as a fixed 8-decimal string so large fractional balances never round.
-- **`getinfo`** — returns `{ version, blocks, bestblockhash, chainsize, difficulty, difficultyhex, connections, chainvalid, address, balance, balance_sat }`.
-
-## Step 2 — Add the tru-cli build target
-
-Copy the client into your source tree and append the CMake target:
-
-```bash
-cp tru-cli.cpp ~/NEW_TRU/src/tru-cli.cpp
-cat tru-cli.CMakeLists.snippet.txt >> ~/NEW_TRU/CMakeLists.txt
-```
-
-## Step 3 — Build
+Build from the TRU source tree:
 
 ```bash
 cd ~/NEW_TRU
 ./rebuild.sh
 ```
 
-`tru-cli` lands in `build-native/bin/` alongside your other binaries. (The node itself is also rebuilt, which is what activates the new RPC methods from step 1.)
+The CLI binary is produced at:
+
+```text
+build-native/bin/tru-cli
+```
 
 ---
 
-## Usage
+## Default connection
 
-Run against the local node (defaults to `127.0.0.1:8332`):
+The native node defaults to:
+
+```text
+RPC host: 127.0.0.1
+RPC port: 21832
+```
+
+Example:
 
 ```bash
 cd ~/NEW_TRU/build-native/bin
 
 ./tru-cli getinfo
 ./tru-cli getbalance
-./tru-cli getbalance 1Fyuq4Nzy65isRXwcbpaHaZJbcGPkS57hb
 ./tru-cli getblockcount
 ./tru-cli getchaininfo
 ./tru-cli getconnectioncount
 ./tru-cli getpeerinfo
 ```
 
-`getinfo` prints:
+---
 
-```
-version       TRU-node
-blocks        960
-bestblockhash 04e9c0..aa
-difficulty    0x1e00ffff (503382015)
-connections   2
-chainvalid    yes
-chainsize     961
-address       1Fyuq4Nzy65isRXwcbpaHaZJbcGPkS57hb
-balance       7599.99990000 TRU
+# RPC authentication
+
+Privileged Core JSON-RPC is authenticated.
+
+Every Core `/rpc` POST requires a Bearer credential. `tru-cli` handles this automatically and should normally be used without putting a token on the command line.
+
+Authentication sources are checked using the configured RPC port:
+
+1. `TRU_RPC_TOKEN` — explicit transport credential.
+2. `TRU_RPC_COOKIE_FILE` — explicit private cookie path.
+3. Default native cookie — `~/.tru/rpc-cookie-<port>`.
+
+For the default port:
+
+```text
+~/.tru/rpc-cookie-21832
 ```
 
-### Talk to a remote node
+The cookie is private node/operator state and must not be committed to Git, printed in documentation, pasted into browser JavaScript, or exposed through a public web endpoint.
+
+A normal local call is simply:
 
 ```bash
-./tru-cli -rpcconnect=137.184.68.43 getblockcount
-./tru-cli -rpcconnect=137.184.68.43 -rpcport=8332 getinfo
+./tru-cli getblockcount
 ```
 
-### Read connection details from a config file
+If the node and CLI use the same account and standard cookie location, no additional credential argument is required.
+
+### Custom cookie path
+
+For a private operator environment:
 
 ```bash
-./tru-cli -conf=~/NEW_TRU/build-native/bin/tru.conf getinfo
+export TRU_RPC_COOKIE_FILE=/secure/private/path/rpc-cookie
+./tru-cli getinfo
 ```
-(reads `rpcconnect`/`node.ip` and `rpcport`/`node.port` if present)
 
-### Raw passthrough — call ANY node method
+### Explicit transport credential
 
-tru-cli ships friendly wrappers for the common methods, but you can reach every method the node exposes via `raw`:
+`TRU_RPC_TOKEN` may be used by private infrastructure when required:
 
 ```bash
-./tru-cli raw gettokenmetadata '{"tokenID":"cottage"}'
-./tru-cli raw listunspent '{"address":"1Fyuq4Nzy65isRXwcbpaHaZJbcGPkS57hb"}'
-./tru-cli raw getblocktemplate
-./tru-cli raw verifytokenbalance '{"address":"1Fyuq4...","tokenID":"cottage"}'
+export TRU_RPC_TOKEN='<PRIVATE_OPERATOR_SECRET>'
+./tru-cli getinfo
 ```
 
-### Options
-
-| option | meaning | default |
-|---|---|---|
-| `-rpcconnect=<ip>` | node IP | 127.0.0.1 |
-| `-rpcport=<port>` | node port | 8332 |
-| `-conf=<file>` | read ip/port from a tru.conf-style file | — |
-| `-json` | print raw JSON result instead of a summary | off |
-| `-timeout=<sec>` | read timeout | 30 |
-| `-h`, `--help` | full command list | — |
-
-### Exit codes
-- `0` success
-- `1` transport error (node unreachable / bad JSON)
-- `2` RPC error (method not found, bad params, etc.)
-
-So you can script it: `./tru-cli getblockcount || echo "node down"`.
+Do not place an actual credential in documentation, shell history intended for sharing, source control, or browser-side code.
 
 ---
 
-## Friendly commands → RPC methods
+## Docker authentication
 
-| tru-cli command | node method |
+Raw Docker node images use the deterministic cookie location:
+
+```text
+/app/data/.rpc-cookie-21832
+```
+
+The Docker Compose layout uses the private shared RPC-auth path:
+
+```text
+/run/truam-rpc/token
+```
+
+When administering a containerized node, prefer running the CLI in the trusted container/private operator environment rather than extracting or printing the credential.
+
+Example:
+
+```bash
+docker exec -it <TRU_NODE_CONTAINER> /app/truam-cli getinfo
+```
+
+Use the actual binary path/name present in the image if it differs.
+
+---
+
+# Common commands
+
+```bash
+./tru-cli getinfo
+./tru-cli getbalance
+./tru-cli getbalance <TRU_ADDRESS>
+./tru-cli getblockcount
+./tru-cli getchaininfo
+./tru-cli getbestblockhash
+./tru-cli getdifficulty
+./tru-cli getconnectioncount
+./tru-cli getpeerinfo
+./tru-cli listaddresses
+./tru-cli listunspent <TRU_ADDRESS>
+./tru-cli listtransactions <TRU_ADDRESS>
+./tru-cli getblock <BLOCK_HASH>
+./tru-cli getblockbyheight <HEIGHT>
+./tru-cli gettransaction <TXID>
+./tru-cli getrawmempool
+./tru-cli getmininginfo
+./tru-cli gettokenmetadata <TOKEN_ID>
+./tru-cli verifytokenbalance <TRU_ADDRESS> <TOKEN_ID>
+```
+
+`getbalance` returns spendable TRU coin balance. Native token holdings are separate and should be queried with the token RPCs.
+
+---
+
+# Read endpoint settings from configuration
+
+```bash
+./tru-cli -conf=/path/to/tru.conf getinfo
+```
+
+The configuration may provide node/RPC endpoint settings such as the RPC host and port.
+
+Authentication is still supplied through the private Patch-05 credential mechanism.
+
+---
+
+# Raw JSON-RPC passthrough
+
+Friendly wrappers cover common operations. `raw` can call any RPC method exposed by the node to the authenticated operator:
+
+```bash
+./tru-cli raw getblocktemplate
+./tru-cli raw gettokenmetadata '{"tokenID":"example"}'
+./tru-cli raw listunspent '{"address":"<TRU_ADDRESS>"}'
+./tru-cli raw verifytokenbalance '{"address":"<TRU_ADDRESS>","tokenID":"example"}'
+```
+
+Raw access is privileged. Availability through `tru-cli raw` does not mean a method is safe for a public website.
+
+---
+
+# DID RPC note
+
+TRU's signed DID registration flow includes:
+
+```text
+getDIDMapping
+registerDIDSigned
+```
+
+The public web-wallet path uses signed registration while keeping the user's private key in the browser.
+
+The legacy `createDID` RPC is not a public browser method and remains outside the public web-wallet gateway.
+
+---
+
+# Remote node administration
+
+Core RPC defaults to loopback and should normally remain private.
+
+A non-loopback RPC bind requires explicit operator opt-in:
+
+```ini
+[network]
+rpcAllowRemote=1
+```
+
+Remote RPC also requires the Patch-05 transport credential and should be protected by host/network controls. Do not publish the privileged RPC listener to the open Internet merely because authentication exists.
+
+Use placeholders in public documentation:
+
+```bash
+./tru-cli -rpcconnect=<PRIVATE_NODE_IP> -rpcport=21832 getinfo
+```
+
+Public websites should use the restricted server-side TRU web gateway rather than connecting browser JavaScript directly to Core `/rpc`.
+
+---
+
+# Options
+
+| Option | Meaning | Default |
+|---|---|---|
+| `-rpcconnect=<ip>` | node RPC IP/host | `127.0.0.1` |
+| `-rpcport=<port>` | node RPC port | `21832` |
+| `-conf=<file>` | read endpoint settings from a TRU config file | — |
+| `-json` | print raw JSON result instead of summary output | off |
+| `-timeout=<sec>` | read timeout | `30` |
+| `-h`, `--help` | show command help | — |
+
+RPC authentication is not disabled by these options.
+
+---
+
+# Friendly commands → RPC methods
+
+| `tru-cli` command | Node method |
 |---|---|
-| `getinfo` | `getinfo` (new, patch 31) |
-| `getbalance [address]` | `getbalance` (new, patch 31) |
+| `getinfo` | `getinfo` |
+| `getbalance [address]` | `getbalance` |
 | `getblockcount` | `getblockcount` |
 | `getchaininfo` | `getchaininfo` |
-| `getbestblockhash` | `getchaininfo` → bestHash |
+| `getbestblockhash` | `getchaininfo` → best hash |
 | `getdifficulty` | `getchaininfo` → difficulty |
 | `getpeerinfo` | `getpeerinfo` |
 | `getconnectioncount` | `getpeerinfo` → count |
@@ -142,13 +261,39 @@ So you can script it: `./tru-cli getblockcount || echo "node down"`.
 | `getmininginfo` | `getminerstatus` |
 | `gettokenmetadata <id>` | `gettokenmetadata` |
 | `verifytokenbalance <addr> <id>` | `verifytokenbalance` |
-| `raw <method> [json]` | any method |
+| `raw <method> [json]` | authenticated raw RPC passthrough |
 
 ---
 
-## Notes / caveats
+# Exit codes
 
-- **No RPC auth.** Your node's `/rpc` endpoint has no HTTP authentication, so tru-cli doesn't send credentials. If you ever put the RPC port on a public interface, front it with Cloudflare Access or a firewall — anyone who can reach `:8332` can call these methods. For local use over `127.0.0.1` this is fine.
-- **`getbalance` is coin balance**, i.e. spendable TRU for an address (matches `calculate_balance`). Token holdings are separate — use `gettokenmetadata` / `verifytokenbalance` for those.
-- **`version` is a placeholder string** (`"TRU-node"`). If you add a real version constant to the node later, change the one line in `handleGetInfo` to emit it.
-- This was verified by compiling tru-cli.cpp against httplib 0.15.3 + nlohmann/json 3.11.3 and exercising every command against a node-shaped mock RPC server (summaries, address override, -json, raw passthrough, and both error paths).
+- `0` — success
+- `1` — transport/authentication/response error
+- `2` — RPC or argument error
+
+Example:
+
+```bash
+./tru-cli getblockcount || echo "node unavailable or RPC call failed"
+```
+
+---
+
+# Security notes
+
+- Privileged Core `/rpc` requires Patch-05 Bearer/cookie authentication.
+- Direct browser access to privileged Core RPC is intentionally forbidden.
+- Core RPC defaults to `127.0.0.1:21832`.
+- Non-loopback RPC requires explicit `rpcAllowRemote=1`.
+- The RPC credential must never be exposed in browser JavaScript.
+- Public websites should use TRU's restricted server-side gateway.
+- Native miners and `tru-cli` automatically support the private RPC cookie.
+- Do not commit `.rpc-cookie*`, environment secrets, WIFs, wallet seeds, or private configuration files to source control.
+- `getbalance` is TRU coin balance; token balances are separate.
+- `getinfo` currently reports the node's aggregate status and wallet-facing summary fields exposed by the implementation.
+
+---
+
+## Release status
+
+This document describes the current authenticated `tru-cli` model after the TRU RPC/Web Patch-05 security boundary and the signed DID registration update.

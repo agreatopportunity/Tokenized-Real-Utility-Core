@@ -3,7 +3,7 @@
 ## Tokenized Real Utility
 ### A UTXO Proof-of-Work Architecture for Programmable Assets, Stateful Contracts, and Verifiable AI Evolution
 
-**Version 2.0 — August 2026**
+**Version 2.1 — September 2026**
 
 ---
 
@@ -110,12 +110,12 @@ What the blockchain preserves is a signed, timestamped, cryptographic commitment
 
 | Parameter | Current TRU Design |
 |---|---|
-| Chain | TrueChain |
+| Chain | TRU Mainnet (`TRUMain`) |
 | Native asset | TRU |
 | Ledger model | UTXO |
 | Consensus | Nakamoto Proof-of-Work |
 | PoW puzzle | `SHA256d + 21E8` |
-| Base unit | 1 TRU = 100,000,000 satoshis |
+| Base unit | 1 TRU = 100,000,000 Atoms |
 | Initial block subsidy | 50 TRU |
 | Halving interval | 210,000 blocks |
 | Target block interval | 60 seconds |
@@ -124,8 +124,8 @@ What the blockchain preserves is a signed, timestamped, cryptographic commitment
 | Coinbase maturity | 100 blocks |
 | Maximum monetary supply | 21,000,000 TRU |
 | Address format | Base58Check P2PKH |
-| Default RPC port | 8332 |
-| Default P2P port | 8333 |
+| Default RPC port | 21832 |
+| Default P2P port | 21833 |
 | Default explorer port | 8001 |
 
 ## 3.2 Staged Large-Block Profile
@@ -220,7 +220,7 @@ The implementation includes:
 
 ## 5.1 Nakamoto Proof-of-Work
 
-TRU selects the valid branch containing the greatest cumulative Proof-of-Work.
+TRU Mainnet (`TRUMain`) selects the valid branch containing the greatest cumulative Proof-of-Work.
 
 Each indexed block contributes work to its parent branch. When a competing branch is discovered, TRU can identify the common ancestor and reorganize when the competing valid chain contains strictly more cumulative work.
 
@@ -413,6 +413,36 @@ Two nodes could receive:
 TRU therefore does **not** treat the generic `OP_EXTERNALDATA` and `OP_DATAFEED` placeholders as production live-oracle consensus features.
 
 External information must ultimately be committed, signed, or otherwise made deterministic before consensus relies on it.
+
+## 7.6 MagicLock — Proof-Conditioned UTXOs
+
+TRU includes a proof-conditioned UTXO primitive called **MagicLock**.
+
+A MagicLock combines ordinary owner authorization with an additional computational condition. To spend a locked output, the owner must provide a valid secp256k1 transaction signature whose double-SHA256 digest satisfies the configured hexadecimal prefix target.
+
+Conceptually:
+
+```text
+valid owner signature
+        +
+HASH256(signature) matches target prefix
+        =
+MagicLock spend may validate
+```
+
+MagicLock does not replace TRU block mining and does not alter network difficulty. The computational search is associated with spending a particular UTXO.
+
+The lock still requires the private key controlling the underlying output; finding a matching digest alone does not transfer ownership to an unrelated party.
+
+Current MagicLock RPC operations include:
+
+```text
+createmagiclock
+listmagiclocks
+unlockmagiclock
+```
+
+Optional attached-data functionality should be treated as experimental. Public on-chain values must not be assumed to provide confidentiality, and sensitive information should not be stored through a construction whose decryption material can be derived from public chain data.
 
 ---
 
@@ -818,7 +848,7 @@ Current network behavior includes:
 - payload checksum verification;
 - large-write handling that retries partial TCP sends.
 
-The public P2P service uses port `8333` by default.
+The public P2P service uses port `21833` by default.
 
 ---
 
@@ -938,7 +968,26 @@ The `raw` command can pass through arbitrary node RPC calls:
 
 This separates interactive operator use from shell scripting and automation.
 
-## 16.4 Qt GUI
+## 16.4 Browser Self-Custody Wallet and Signed DID Registration
+
+TRU also supports a browser self-custody wallet architecture.
+
+For browser users, private-key generation and wallet encryption occur locally in the browser. The privileged Core RPC credential is not delivered to browser JavaScript. Browser applications use a restricted server-side gateway rather than connecting directly to Core `/rpc`.
+
+The current signed DID registration path uses:
+
+```text
+getDIDMapping
+registerDIDSigned
+```
+
+A browser wallet can derive its DID from its TRU address, sign the canonical registration message with the locally held secp256k1 key, and submit only the DID, address, public key, and signature. Core verifies that the public key derives the claimed address, verifies the signature, verifies the deterministic DID/address relationship, and rejects conflicting remaps.
+
+The legacy `createDID` operation is not exposed as a public browser method.
+
+The current DID registry is durable node/application state. It is not yet a consensus transaction replicated automatically to every independent node through block synchronization; chain-global DID registration remains future protocol work.
+
+## 16.5 Qt GUI
 
 TRU also contains Qt-based desktop wallet/interface functionality for graphical operation.
 
@@ -946,11 +995,17 @@ TRU also contains Qt-based desktop wallet/interface functionality for graphical 
 
 # 17. JSON-RPC and Developer Interface
 
-The node exposes JSON-RPC over HTTP, normally at:
+The node exposes privileged JSON-RPC over HTTP, normally at:
 
 ```text
-127.0.0.1:8332/rpc
+127.0.0.1:21832/rpc
 ```
+
+Privileged Core RPC requires Patch-05 transport authentication. Every Core `/rpc` POST requires a Bearer credential. The node normally creates or reuses a private per-port RPC cookie, and `tru-cli` plus the native miners can read that credential automatically.
+
+Core RPC defaults to loopback. A non-loopback RPC bind requires explicit `rpcAllowRemote=1`. Direct browser access to privileged Core RPC is intentionally rejected, and Core does not expose wildcard browser CORS for `/rpc`.
+
+Public browser applications use restricted server-side gateways such as `/api/wallet/rpc` and `/api/mining/rpc`; those gateways expose only allow-listed methods and do not disclose the Core credential.
 
 Representative method groups include:
 
@@ -1045,9 +1100,13 @@ trainAIToken
 ## Identity / Social
 
 ```text
-createDID
+getDIDMapping
+registerDIDSigned
+createDID              privileged / legacy internal path
 createsocialpost
 ```
+
+`registerDIDSigned` is the authenticated ownership path intended for the browser-wallet DID flow. The legacy `createDID` method is not exposed through the public browser gateway.
 
 RPC is an application-control interface and is distinct from the public P2P port.
 
@@ -1095,13 +1154,13 @@ tru-miner-gpu
 
 Containerized nodes persist chain data through Docker volumes and load machine-specific configuration through `tru.conf`.
 
-The reference operational network currently uses multiple hosts, including a public seed node, a GPU-capable peer, and a native development/explorer host.
+TRU supports multi-node deployment across native and containerized hosts. Public release documentation should publish only the network endpoints required for participation and should avoid embedding private administrative infrastructure or credentials.
 
-Container releases can be published as immutable numbered tags while `latest` points to the newest build.
+Container releases can be published as immutable numbered tags while `latest` points to the newest build. Public launch records should retain the immutable registry digest of the exact released image.
 
 ---
 
-# 20. Economic Model
+# 20. Protocol Monetary and Reward Schedule
 
 ## 20.1 Native Asset
 
@@ -1116,7 +1175,7 @@ Maximum supply:  21,000,000 TRU
 Precision:       8 decimal places
 ```
 
-## 20.2 Miner Revenue
+## 20.2 Miner Rewards
 
 A valid coinbase may claim:
 
@@ -1133,6 +1192,27 @@ Transactions, token issuance, AI anchor transactions, and other network operatio
 This whitepaper intentionally does not declare a permanent market-wide fee schedule where the current implementation does not establish one as a fixed protocol-economic rule.
 
 Fee policy can evolve independently from the fundamental 21-million-TRU monetary schedule where consensus permits.
+
+## 20.4 Intended Public-Launch Distribution Policy
+
+The intended public-launch model is protocol distribution through Proof-of-Work rather than a project token sale.
+
+The public-launch policy is:
+
+```text
+Genesis premine:        NONE
+Founder allocation:     NONE
+Treasury allocation:    NONE
+Investor allocation:    NONE
+ICO / presale:          NONE
+Protocol distribution:  PROOF-OF-WORK
+```
+
+Following public network activation, the project's developer may participate in mining using the same published Proof-of-Work algorithm, difficulty rules, block reward, and publicly available software offered to other participants.
+
+These distribution statements should be published as historical facts only for a final launch chain whose genesis and early distribution have been independently verified against the actual chain history and release timeline.
+
+The project makes no representation or promise concerning future TRU price, exchange listing, liquidity, yield, or investment return.
 
 ---
 
@@ -1171,24 +1251,32 @@ Stateful operations should be tested against:
 Sensitive material includes:
 
 - wallet private keys;
-- `tru.dat`;
-- seed files;
-- wallet index/identity files;
+- wallet passphrases;
+- encrypted wallet/seed artifacts and any legacy plaintext wallet artifacts;
+- RPC cookies and `TRU_RPC_TOKEN`;
+- swap/operator secrets;
 - oracle WIF;
 - AI API credentials.
 
-These must not be committed to public source repositories.
+These must not be committed to public source repositories. Public documentation should use placeholders rather than real credentials, private administrative addresses, or machine-specific secret paths.
 
 ## 21.5 RPC Security
 
-The current RPC interface does not provide native HTTP authentication.
+Privileged Core RPC uses mandatory transport authentication.
 
-Therefore:
+The default security boundary is:
 
 ```text
-8333 P2P -> intended for peer networking
-8332 RPC -> keep private / loopback / authenticated proxy
+21833 P2P -> may be public for peer networking
+21832 RPC -> loopback by default; Bearer/cookie authentication required
+8001  Explorer / restricted web gateway -> expose only as intended
 ```
+
+The node creates or reuses a private per-port RPC cookie unless an explicit private transport credential is configured. `tru-cli` and native miners support the same authenticated transport.
+
+Direct browser access to privileged Core `/rpc` is intentionally forbidden. Browser applications use the restricted server-side wallet/mining gateway, which forwards only allow-listed operations and does not expose the Core credential.
+
+A non-loopback Core RPC bind requires explicit `rpcAllowRemote=1` and should still be protected by host/network controls.
 
 ## 21.6 Implementation Maturity
 
@@ -1249,7 +1337,10 @@ The current codebase implements:
 - full/compact `M/m` terminal menu;
 - live mining dashboard;
 - standalone `tru-cli`;
-- JSON-RPC;
+- authenticated privileged JSON-RPC transport;
+- restricted public web RPC gateway;
+- browser self-custody wallet architecture;
+- signed DID ownership registration;
 - HTTP explorer;
 - Docker deployment;
 - size-aware large-block construction;
@@ -1264,8 +1355,9 @@ The following should not yet be described as complete production capabilities:
 - `OP_DELEGATECHECK`;
 - `OP_TOKEN_BALANCE`;
 - `OP_BURN_TOKEN`;
-- NOVO bridge;
-- BSTY bridge.
+- NOVO bridge opcodes;
+- BSTY bridge opcodes;
+- consensus/P2P replication of the DID registry.
 
 ---
 
@@ -1561,7 +1653,11 @@ That is the foundation of **Tokenized Real Utility**.
 | Interactive CLI | Implemented |
 | `tru-cli` | Implemented |
 | Qt GUI | Implemented |
-| JSON-RPC | Implemented |
+| Privileged JSON-RPC authentication | Implemented |
+| Restricted browser RPC gateway | Implemented |
+| Browser self-custody wallet | Implemented |
+| Signed DID registration | Implemented node/application state |
+| DID consensus/P2P replication | Not yet |
 | Explorer | Implemented |
 | Docker deployment | Implemented |
 | Generic external-data opcode | Placeholder |
@@ -1579,18 +1675,20 @@ That is the foundation of **Tokenized Real Utility**.
 Default ports:
 
 ```text
-8332  JSON-RPC
-8333  P2P
+21832  JSON-RPC
+21833  P2P
 8001  Explorer
 ```
 
 Recommended exposure:
 
 ```text
-P2P 8333: public when operating a reachable peer
-RPC 8332: private / loopback / authenticated proxy
-Explorer 8001: expose according to deployment requirements
+P2P 21833: public when operating a reachable peer
+RPC 21832: loopback by default; mandatory Bearer/cookie auth
+Explorer / restricted gateway 8001: expose according to deployment requirements
 ```
+
+Public websites must not receive the privileged Core RPC credential. Direct browser access to Core `/rpc` is not part of the supported public architecture.
 
 ---
 
@@ -1618,13 +1716,15 @@ Provider availability depends on node/application configuration.
 
 This white paper is technical and informational documentation.
 
-It is not financial advice, an investment recommendation, a promise of future value, or an offer to buy or sell any security or financial instrument.
+It is not financial advice, an investment recommendation, or a promise of future value. This document does not solicit the purchase of TRU or participation in an ICO, presale, SAFT, crowdfunding token sale, yield program, or revenue-sharing arrangement.
+
+TRU does not represent equity in a company, a contractual right to business profits, dividends, guaranteed yield, or a project redemption promise.
 
 TRU is an evolving software project and independent blockchain. Software defects, cryptographic failures, implementation errors, network attacks, consensus failures, regulatory changes, market conditions, loss of private keys, and other risks can result in loss of access or value.
 
 Statements describing roadmap items, potential applications, scaling directions, or future protocol work are goals and architectural directions, not guarantees.
 
-Users, developers, miners, and operators should independently evaluate the software and applicable legal requirements before relying on the network for material value.
+Users, developers, miners, and operators should independently evaluate the software and the legal requirements applicable to them before relying on the network for material value. Any future project-operated sale, custodial service, exchange/transmission service, investment program, or materially different distribution model should be evaluated separately before launch.
 
 ---
 
@@ -1634,7 +1734,9 @@ Users, developers, miners, and operators should independently evaluate the softw
 
 Website: `https://tokenizedrealutility.com`
 
-Source repository / public community links should be added to this document only when the final public endpoints are selected.
+Public release documentation should identify the exact release version, immutable container digest, final genesis hash, and public source repository once those values are fixed.
+
+This white paper should not be used to imply that a Docker/binary-only release is open-source before the corresponding source code and license are publicly available.
 
 ---
 

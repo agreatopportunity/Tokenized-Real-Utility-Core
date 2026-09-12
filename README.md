@@ -2,38 +2,76 @@
 
 > **A UTXO-based Proof-of-Work Layer 1 combining Bitcoin-style ownership, stateful smart contracts, native tokenization, AI-oracle anchoring, Living Tokens, CPU/GPU mining, and a complete node / wallet / CLI / explorer stack.**
 
-TRU is an independent Layer-1 blockchain written in C++17. The chain is internally known as **TrueChain**, its native asset is **TRU**, and the project is focused on **Tokenized Real Utility**: bringing ownership, programmable assets, verifiable state, real-world data workflows, and AI-assisted applications together on one UTXO-based network.
+TRU is an independent Layer-1 blockchain written in C++17. The chain is internally known as **TRU**, its native asset is **TRU**, and the project is focused on **Tokenized Real Utility**: bringing ownership, programmable assets, verifiable state, real-world data workflows, and AI-assisted applications together on one UTXO-based network.
 
 TRU is not an ERC-20 token, sidechain, or cosmetic Bitcoin fork. It implements its own blockchain node, Proof-of-Work validation, UTXO ledger, mempool, P2P networking, mining, wallet, script interpreter, token layer, AI-oracle subsystem, JSON-RPC API, command-line tools, and block explorer.
 
-TRU — OPEN-SOURCE SOFTWARE NOTICE
+## TRU — PUBLIC SOFTWARE AND NETWORK NOTICE
 
-TRU is free and open-source blockchain software.
+TRU is blockchain software for operating and participating in the
+Tokenized Real Utility network.
 
-The TRU project is not conducting a token sale, ICO, presale,
-crowdfunding offering, investment program, or securities offering.
+This initial release is provided free of charge.
 
-No purchase of TRU from the project is required to download, use,
-develop, validate, or participate in the TRU network.
+The TRU project is not selling TRU, conducting an ICO, presale,
+SAFT, crowdfunding token sale, or soliciting investment in TRU.
 
-The TRU protocol does not provide holders with equity, ownership in
-a company, dividends, revenue sharing, rights to business profits,
-guaranteed yield, redemption rights, or promises of financial return.
+No purchase from the project is required to operate a node,
+participate in the network, or mine according to the protocol.
 
-Native TRU units are produced according to the public proof-of-work
-consensus rules of the network. The software protocol determines
-block rewards and network operation.
+TRU does not provide equity, ownership in a company, dividends,
+revenue sharing, guaranteed yield, redemption rights, or contractual
+rights to business profits.
 
-The project makes no representation or promise regarding the monetary
-value of TRU, future market prices, exchange listings, liquidity, or
-investment returns.
+Initial distribution:
 
-TRU software is provided for technical, computational, development,
-and network-participation purposes.
+Genesis premine:        NONE
+Founder allocation:     NONE
+Treasury allocation:    NONE
+Investor allocation:    NONE
+ICO / presale:          NONE
+Protocol distribution:  PROOF-OF-WORK
 
-Users are responsible for determining and complying with laws and
-regulations applicable in their jurisdiction.
+Native TRU units are created according to the protocol-defined
+Proof-of-Work block reward.
+
+Following public network activation, the project's developer may
+participate in mining using the same publicly available software,
+Proof-of-Work algorithm, difficulty rules, and block rewards available
+to other network participants.
+
+The project makes no promise or representation regarding future
+monetary value, market price, exchange listing, liquidity, or
+investment return.
+
+TRU is provided for software development, computation, network
+participation, tokenization, smart-contract, and other technical uses.
+
+Users are responsible for compliance with laws applicable to them
+and their jurisdiction.
+
 ---
+
+### Public Launch Record
+
+Public announcement: 9-12-2026
+Network activation:  9-12-2026
+
+Node image:
+ghcr.io/agreatopportunity/tru-node:2.0.2
+
+Immutable image digest:
+sha256:b2d0dc79b4f690fd8d65a5bb8ee9647120d66023474e1d82c7af134d1345e3ac
+
+Genesis hash:
+
+
+Initial block reward:
+50 TRU
+
+Mining:
+Public Proof-of-Work
+No reserved founder or project mining reward
 
 ## Highlights
 
@@ -91,7 +129,7 @@ regulations applicable in their jurisdiction.
 
 | Parameter | Current design |
 |---|---|
-| Chain | TrueChain |
+| Chain | Tokenized Real Utility |
 | Native asset | TRU |
 | Model | UTXO |
 | Consensus | Nakamoto Proof-of-Work |
@@ -566,7 +604,7 @@ provides an interactive interface for:
 It connects to the TRU node through JSON-RPC, normally on:
 
 ```text
-127.0.0.1:8332
+127.0.0.1:21832
 ```
 
 and uses the node RPC methods:
@@ -624,7 +662,7 @@ curl -sS \
       "targetPrefix":"21e8"
     }
   }' \
-  http://127.0.0.1:8332/rpc
+  http://127.0.0.1:21832/rpc
 ```
 
 List MagicLocks:
@@ -638,7 +676,7 @@ curl -sS \
     "method":"listmagiclocks",
     "params":{}
   }' \
-  http://127.0.0.1:8332/rpc
+  http://127.0.0.1:21832/rpc
 ```
 
 Unlock one:
@@ -656,7 +694,7 @@ curl -sS \
       "recipient":"<TRU_ADDRESS>"
     }
   }' \
-  http://127.0.0.1:8332/rpc
+  http://127.0.0.1:21832/rpc
 ```
 
 ## Why MagicLock is different
@@ -929,7 +967,7 @@ Query another address:
 Remote node:
 
 ```bash
-./tru-cli -rpcconnect=<NODE_IP> -rpcport=8332 getinfo
+./tru-cli -rpcconnect=<NODE_IP> -rpcport=21832 getinfo
 ```
 
 Read connection settings from a TRU config file:
@@ -1003,7 +1041,7 @@ Example standalone CPU miner:
 ```bash
 ./tru_miner_cpu \
   --node-ip 127.0.0.1 \
-  --node-port 8332 \
+  --node-port 21832 \
   --mineraddr <TRU_ADDRESS> \
   --threads 4
 ```
@@ -1105,7 +1143,7 @@ Contract state, token metadata, ownership data, inscriptions, and evolution reco
 The node exposes JSON-RPC at:
 
 ```text
-http://127.0.0.1:8332/rpc
+http://127.0.0.1:21832/rpc
 ```
 
 Example:
@@ -1114,7 +1152,7 @@ Example:
 curl -sS \
   -H 'Content-Type: application/json' \
   --data '{"jsonrpc":"2.0","id":1,"method":"getchaininfo","params":{}}' \
-  http://127.0.0.1:8332/rpc
+  http://127.0.0.1:21832/rpc
 ```
 
 TRU exposes a broad RPC surface. Representative groups include:
@@ -1209,6 +1247,8 @@ trainAIToken
 ```text
 createDID
 createsocialpost
+getDIDMapping
+registerDIDSigned
 ```
 
 ## Network
@@ -1219,7 +1259,7 @@ getpeerinfo
 
 `tru-cli raw` can access methods that do not yet have a friendly CLI wrapper.
 
-> **Security:** RPC currently has no built-in HTTP authentication. Keep port `8332` on loopback or behind a properly authenticated reverse proxy/firewall.
+> **Security:** RPC currently has no built-in HTTP authentication. Keep port `21832` on loopback or behind a properly authenticated reverse proxy/firewall.
 
 ---
 
@@ -1293,7 +1333,7 @@ cd ~/NEW_TRU/build-native/bin
 ./tru_advanced \
   --datadir data/utxo \
   --cli \
-  --rpcport 8332
+  --rpcport 21832
 ```
 
 With the explorer:
@@ -1302,7 +1342,7 @@ With the explorer:
 ./tru_advanced \
   --datadir data/utxo \
   --cli \
-  --rpcport 8332 \
+  --rpcport 21832 \
   --enable-explorer \
   --explorer-port 8001
 ```
@@ -1335,20 +1375,20 @@ Basic node example:
 
 ```bash
 docker run -it --name tru-node \
-  -p 8333:8333 \
+  -p 21833:21833 \
   -v tru-data:/app/data \
   -v "$(pwd)/tru.conf:/app/tru.conf:ro" \
   tru-node:latest --cli
 ```
 
-P2P port `8333` is the public peer port.
+P2P port `21833` is the public peer port.
 
-RPC port `8332` should **not** be exposed publicly.
+RPC port `21832` should **not** be exposed publicly.
 
 When RPC must be reachable from the Docker host, bind the service appropriately inside the container but publish it only to host loopback, for example:
 
 ```text
-127.0.0.1:8332:8332
+127.0.0.1:21832:21832
 ```
 
 Docker Compose profiles can run:
@@ -1370,12 +1410,12 @@ Example:
 ```ini
 [network]
 rpcbind=127.0.0.1
-rpcport=8332
-p2pPort=8333
+rpcport=21832
+p2pPort=21833
 listen=1
 rpcMaxConnections=32
 externalip=<PUBLIC_OR_LAN_IP>
-addnode=<SEED_IP>:8333
+addnode=<SEED_IP>:21833
 ```
 
 Important parser behavior:
@@ -1448,8 +1488,6 @@ Current considerations include:
 - Independent security review and consensus reimplementation would strengthen production readiness.
 - Consensus changes should be tested across multiple nodes before real value depends on them.
 - Large-block settings must be coordinated network-wide.
-- RPC currently has no native HTTP authentication.
-- Wallet and oracle private keys are sensitive local secrets.
 - AI-provider API keys should never be written to chain state or committed to Git.
 - Bridges require substantially more security review before production use.
 - Very large configured block limits must not be confused with benchmarked sustainable throughput.
@@ -1457,10 +1495,23 @@ Current considerations include:
 For public deployments:
 
 ```text
-8333/tcp  P2P   -> may be public
-8332/tcp  RPC   -> keep private / authenticated
+21833/tcp  P2P   -> may be public
+21832/tcp  RPC   -> keep private / authenticated
 8001/tcp  Explorer -> expose only as intended
 ```
+
+Privileged Core JSON-RPC requires transport authentication.
+
+Default RPC bind: 127.0.0.1
+Default RPC port: 21832
+Public P2P port: 21833
+
+Direct browser access to privileged Core RPC is forbidden.
+Browser applications use the restricted same-origin web gateway.
+Core RPC credentials are never exposed to browser JavaScript.
+
+Remote Core RPC requires explicit configuration and should be
+protected by network/firewall controls in addition to RPC authentication.
 
 ---
 

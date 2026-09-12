@@ -1,9 +1,0 @@
-{
-  "protocol": "TRU-SWAP-A-RUNTIME-CLOSEOUT-V1",
-  "swapId": "4a13448e91b40d480597b2f29a66b046835ccf91d67c0eec3038e63d1b707b29",
-  "expectedState": "ONE_SIDE_FUNDED",
-  "expectedTransitionSeq": 1,
-  "secretHash160": "ffc0eb9ec27af6f598b03972e84c588c2cd80b87",
-  "guardSwapId": "e19cd34600d30f91fc4d4d050e15139cbd4060cf3ca4b84fb912423e263e0340",
-  "createdAtUnix": 1788621449
-}
