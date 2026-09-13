@@ -1450,7 +1450,25 @@ bool mineBlockGPU_21E8_AutoTuned(Block& candidate, uint64_t maxNonce, httplib::C
                                         }
 
                                         bool credited = false;
-                                        if (!foundFlag && !g_found.load()) {
+                                        // GPU-CREDIT-01: credit is decided by THIS kernel's own
+                                        // foundFlag, not by the process-wide g_found.
+                                        //
+                                        // The kernel aborts on its own device flag:
+                                        //     if(atomic_cmpxchg(foundFlag, 0, 0) != 0) return;
+                                        // so any kernel that exited early already reads back
+                                        // foundFlag != 0 and is correctly denied credit by
+                                        // !foundFlag alone.
+                                        //
+                                        // The former extra "&& !g_found.load()" denied credit to
+                                        // kernels that ran a FULL sweep and found nothing, purely
+                                        // because some other kernel on some other device had won
+                                        // in the meantime. At short block times g_found is set most
+                                        // of the time, so nearly all honest work scored zero:
+                                        //     "Found: 1, Credited hashes: 0, Rate: 0.000000 H/s"
+                                        // g_sessionHashes then stayed 0 and the keepalive reporter
+                                        // published hashRate 0, so the explorer counted no active
+                                        // miners even while both GPUs ran at 100%.
+                                        if (!foundFlag) {
                                             creditCompletedHashWork(workCompleted);
                                             device->deviceHashes += workCompleted;
                                             credited = true;
@@ -1506,13 +1524,15 @@ bool mineBlockGPU_21E8_AutoTuned(Block& candidate, uint64_t maxNonce, httplib::C
                         for (size_t j = 0; j < events.size(); j++) {
                             clWaitForEvents(1, &events[j]);
                             
-                            // Credit only if no local/global solution was observed.
-                            // A successful NDRange can contain early-returning work-items.
+                            // GPU-CREDIT-01: same correction as the monitor loop above.
+                            // This kernel's own foundFlag already covers early-returning
+                            // work-items; g_found only says some OTHER device won, which
+                            // is not a reason to discard this device's completed sweep.
                             size_t remainingWork = kernelWorkSizes[j];
                             int foundFlag = 0;
                             clEnqueueReadBuffer(device->queue, device->foundFlag_buf, CL_TRUE, 0,
                                                 sizeof(int), &foundFlag, 0, nullptr, nullptr);
-                            if (!foundFlag && !g_found.load()) {
+                            if (!foundFlag) {
                                 creditCompletedHashWork(remainingWork);
                                 device->deviceHashes += remainingWork;
                             }
