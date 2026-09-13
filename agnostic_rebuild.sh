@@ -3,7 +3,7 @@ set -Eeuo pipefail
 umask 077
 
 # ============================================================================
-# TRU portable rebuild.sh
+# TRU portable build script (agnostic_rebuild.sh)
 #
 # Goals:
 #   * no hard-coded username, HOME, repo path, x86_64 library path, or protoc path
@@ -17,12 +17,12 @@ umask 077
 #   native | arm32 | arm64 | win64
 #
 # Examples:
-#   ./rebuild.sh
-#   ./rebuild.sh native
-#   ./rebuild.sh --arch native --run
-#   ./rebuild.sh --arch native --clean
-#   ./rebuild.sh --arch native --purge-build
-#   ./rebuild.sh --arch native --reset-utxo
+#   ./agnostic_rebuild.sh
+#   ./agnostic_rebuild.sh native
+#   ./agnostic_rebuild.sh --arch native --run
+#   ./agnostic_rebuild.sh --arch native --clean
+#   ./agnostic_rebuild.sh --arch native --purge-build
+#   ./agnostic_rebuild.sh --arch native --reset-utxo
 #
 # Environment overrides:
 #   TRU_BUILD_JOBS=8
@@ -50,7 +50,7 @@ JOBS="${TRU_BUILD_JOBS:-}"
 usage() {
     cat <<'EOF'
 Usage:
-  ./rebuild.sh [native|arm32|arm64|win64] [options]
+  ./agnostic_rebuild.sh [native|arm32|arm64|win64] [options]
 
 Options:
   --arch MODE       native | arm32 | arm64 | win64
@@ -64,13 +64,13 @@ Options:
   -h, --help        show this help
 
 Normal rebuild:
-  ./rebuild.sh native
+  ./agnostic_rebuild.sh native
 
 Build and launch:
-  ./rebuild.sh native --run
+  ./agnostic_rebuild.sh native --run
 
 Fresh CMake/build tree while preserving wallet/runtime:
-  ./rebuild.sh native --purge-build
+  ./agnostic_rebuild.sh native --purge-build
 
 IMPORTANT:
   Normal rebuilds DO NOT erase chain/UTXO state.
@@ -226,7 +226,7 @@ if command -v c++ >/dev/null 2>&1; then
 fi
 
 [[ -f "$REPO_ROOT/CMakeLists.txt" ]] ||
-    fail "CMakeLists.txt not found next to rebuild.sh: $REPO_ROOT"
+    fail "CMakeLists.txt not found next to agnostic_rebuild.sh: $REPO_ROOT"
 
 if [[ "$ARCH" == "native" ]]; then
     command -v c++ >/dev/null 2>&1 ||

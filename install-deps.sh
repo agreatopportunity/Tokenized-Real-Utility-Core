@@ -178,8 +178,9 @@ if report; then
      cd /path/to/TRU
      ./agnostic_rebuild.sh
 
- Use agnostic_rebuild.sh, NOT rebuild.sh. rebuild.sh deletes the
- build directory, and a native wallet lives in build-native/bin/.
+ Binaries land in build-native/bin/. Your encrypted wallet is kept
+ outside the build tree in ~/.local/share/tru/wallet/ and restored
+ after each build.
 ============================================================
 DONE
 else
