@@ -551,7 +551,7 @@ fi
 if [[ "$RUN_AFTER_BUILD" -eq 1 ]]; then
     info "Starting TRU Advanced..."
     cd "$BIN_DIR"
-    exec ./tru_advanced --cli --enable-explorer
+    exec ./tru_advanced --cli
 else
     echo "NODE_START=NO"
     echo
