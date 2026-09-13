@@ -30,6 +30,7 @@
 #include <condition_variable>
 #include <atomic>
 #include <future>
+#include <sstream>  // WEB-MINER-01 canonical browser coinbase tag
 #include <limits>
 #include <unordered_map>
 #include <unordered_set>   // template double-spend guard
@@ -4175,7 +4176,7 @@ static json handleGetNewAddress(Wallet& wallet, const json &/*params*/, int id) 
 //========================
 // Get block template
 //========================
-static json handleGetBlockTemplate(Blockchain &chain) {
+static json handleGetBlockTemplate(Blockchain &chain, const json &params = json::object()) {
     //
     // Hash + height must come from one chain snapshot so the template cannot
     // mix an old parent hash with a new height (or vice versa).
@@ -4356,18 +4357,173 @@ static json handleGetBlockTemplate(Blockchain &chain) {
     gbt["skippedforsize"] = skippedForSize;
     gbt["skippedinvalid"] = skippedInvalid;
 
+    // WEB-MINER-01: browser mining must hash the exact candidate the node will
+    // later validate.  Legacy wallet.js tried to manufacture a Bitcoin-style
+    // block in JavaScript even though TRU submitblock accepts Block::serialize().
+    // When browserMinerAddress is supplied, prepare the canonical candidate
+    // here using the same transaction classes, merkle routine and header builder
+    // as the native miner.  This is work preparation only; consensus and block
+    // validation are unchanged.
+    if (params.contains("browserMinerAddress")) {
+        if (!params["browserMinerAddress"].is_string()) {
+            throw std::runtime_error("browserMinerAddress must be a string");
+        }
+        const std::string minerAddr =
+            params["browserMinerAddress"].get<std::string>();
+        if (!chain.isValidAddress(minerAddr)) {
+            throw std::runtime_error("invalid browser miner address");
+        }
+
+        int extraNonce = 0;
+        if (params.contains("browserExtraNonce")) {
+            const auto& rawExtraNonce = params["browserExtraNonce"];
+            if (rawExtraNonce.is_number_unsigned()) {
+                const uint64_t value = rawExtraNonce.get<uint64_t>();
+                if (value > static_cast<uint64_t>(std::numeric_limits<int>::max())) {
+                    throw std::runtime_error("browserExtraNonce out of range");
+                }
+                extraNonce = static_cast<int>(value);
+            } else if (rawExtraNonce.is_number_integer()) {
+                const int64_t value = rawExtraNonce.get<int64_t>();
+                if (value < 0 ||
+                    value > static_cast<int64_t>(std::numeric_limits<int>::max())) {
+                    throw std::runtime_error("browserExtraNonce out of range");
+                }
+                extraNonce = static_cast<int>(value);
+            } else {
+                throw std::runtime_error("browserExtraNonce must be an integer");
+            }
+        }
+
+        const std::string bitsHex = gbt["bits"].get<std::string>();
+        const uint32_t bitsVal =
+            static_cast<uint32_t>(std::stoul(bitsHex, nullptr, 16));
+        const uint32_t workTime =
+            static_cast<uint32_t>(gbt["curtime"].get<uint64_t>());
+        const int32_t workVersion =
+            static_cast<int32_t>(gbt["version"].get<int64_t>());
+
+        // Intentionally mirror my_miner.cpp's candidate construction.
+        Block candidate(workVersion, parentHash, workTime, bitsVal);
+        candidate.height = nextHeight;
+
+        Transaction coinbase(true);
+        std::ostringstream cb;
+        cb << "TRU:" << nextHeight << "|WEB:" << extraNonce;
+        const std::string cbText = cb.str();
+        coinbase.vin.emplace_back(
+            "COINBASE",
+            0,
+            std::vector<unsigned char>(cbText.begin(), cbText.end()),
+            std::vector<unsigned char>());
+        TxOut rewardOut;
+        rewardOut.amount = gbt["coinbasevalue"].get<uint64_t>();
+        rewardOut.scriptPubKey =
+            createP2PKHScriptHexFromAddress(minerAddr);
+        coinbase.vout.push_back(rewardOut);
+        coinbase.computeTxId();
+        candidate.transactions.push_back(coinbase);
+
+        for (const auto& txItem : gbt["transactions"]) {
+            if (!txItem.contains("data") || !txItem["data"].is_string()) {
+                continue;
+            }
+            const std::vector<unsigned char> raw =
+                hexDecode(txItem["data"].get<std::string>());
+            Transaction memTx = Transaction::deserializeBinary(raw);
+            memTx.computeTxId();
+            candidate.transactions.push_back(std::move(memTx));
+        }
+
+        candidate.header.merkleRoot =
+            computeMerkleRoot(candidate.transactions);
+        candidate.header.nonce = 0;
+        candidate.blockHash = candidate.computeHash();
+
+        const std::vector<unsigned char> header80 =
+            buildBlockHeader80(candidate.header);
+        unsigned char targetLE[32];
+        bitsToTargetArrayFree(bitsVal, targetLE);
+        const std::vector<unsigned char> targetBytes(
+            targetLE, targetLE + 32);
+
+        gbt["browserWork"] = {
+            {"version", "TRU-WEB-MINER-01"},
+            {"minerAddress", minerAddr},
+            {"extraNonce", extraNonce},
+            {"height", candidate.height},
+            {"previousblockhash", candidate.header.prevHash},
+            {"merkleRoot", candidate.header.merkleRoot},
+            {"timestamp", candidate.header.timestamp},
+            {"bits", bitsHex},
+            {"coinbasevalue", gbt["coinbasevalue"]},
+            {"headerHex", bytesToHex(header80)},
+            {"targetLEHex", bytesToHex(targetBytes)},
+            {"candidate", candidate.serialize()}
+        };
+    }
+
     return gbt;
 }
 //========================
 // Submit block
 //========================
 static json handleSubmitBlockOptimized(Blockchain &chain, P2PNode &node, const json &p, int id) {
-    if (!p.contains("blockHex") || !p["blockHex"].is_string()) {
-        return makeError(-32602, "Missing 'blockHex'");
-    }
-
     try {
-        Block b = Block::deserialize(p["blockHex"].get<std::string>());
+        std::string submittedBlock;
+
+        // WEB-MINER-01: browser miners receive a node-built canonical candidate
+        // from getblocktemplate(browserMinerAddress=...).  They only search the
+        // 32-bit nonce field.  Rehydrate that exact candidate here, install the
+        // winning nonce and recompute the block hash server-side before feeding
+        // it into the unchanged authoritative submit/validation path.
+        if (p.contains("browserCandidate")) {
+            if (!p["browserCandidate"].is_string() ||
+                !p.contains("nonce") ||
+                !(p["nonce"].is_number_unsigned() ||
+                  p["nonce"].is_number_integer())) {
+                return makeError(
+                    -32602,
+                    "browserCandidate requires a serialized candidate and nonce");
+            }
+
+            uint32_t browserNonce = 0;
+            if (p["nonce"].is_number_unsigned()) {
+                const uint64_t value = p["nonce"].get<uint64_t>();
+                if (value > static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())) {
+                    return makeError(-32602, "Browser mining nonce out of range");
+                }
+                browserNonce = static_cast<uint32_t>(value);
+            } else {
+                const int64_t value = p["nonce"].get<int64_t>();
+                if (value < 0 ||
+                    static_cast<uint64_t>(value) >
+                        static_cast<uint64_t>(std::numeric_limits<uint32_t>::max())) {
+                    return makeError(-32602, "Browser mining nonce out of range");
+                }
+                browserNonce = static_cast<uint32_t>(value);
+            }
+
+            Block prepared =
+                Block::deserialize(p["browserCandidate"].get<std::string>());
+            prepared.header.nonce = browserNonce;
+            prepared.blockHash = prepared.computeHash();
+            submittedBlock = prepared.serialize();
+
+            Logger::log(
+                "[WEB-MINER-01] Browser solution prepared height=" +
+                std::to_string(prepared.height) +
+                " nonce=" + std::to_string(prepared.header.nonce) +
+                " hash=" + prepared.blockHash);
+        } else if (p.contains("blockHex") && p["blockHex"].is_string()) {
+            submittedBlock = p["blockHex"].get<std::string>();
+        } else {
+            return makeError(
+                -32602,
+                "Missing 'blockHex' or browserCandidate/nonce");
+        }
+
+        Block b = Block::deserialize(submittedBlock);
         if (b.blockHash.empty() || b.height <= 0) {
             return makeError(-32000, "Invalid block format");
         }
@@ -8580,7 +8736,7 @@ void startRPCServer(Blockchain &chain, Wallet &wallet, P2PNode &node, int port,
         else if (m=="reportmineractivity") response=handleReportMinerActivityOptimized(chain,params,id);
         else if (m=="getblocktemplate") {
             try {
-                response = makeResult(id, handleGetBlockTemplate(chain));
+                response = makeResult(id, handleGetBlockTemplate(chain, params));
             } catch (const std::exception& e) {
                 Logger::log(
                     "[getblocktemplate] ERROR: candidate ancestry/difficulty failure: " +
