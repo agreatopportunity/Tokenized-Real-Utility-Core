@@ -557,5 +557,5 @@ else
     echo
     echo "To run:"
     echo "  cd \"$BIN_DIR\""
-    echo "  ./tru_advanced --cli --enable-explorer"
+    echo "  ./tru_advanced --cli "
 fi
