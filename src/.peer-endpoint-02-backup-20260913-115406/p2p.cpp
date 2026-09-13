@@ -159,11 +159,8 @@ void P2PNode::acceptLoop() {
         std::shared_ptr<PeerConnection> peer;
         try {
             peer = std::make_shared<PeerConnection>(
-                clientSock, clientIpString, clientPort, blockchain_, this, true);
-            // PEER-ENDPOINT-02: clientPort is the remote TCP source port.
-            // Never admit it to the persistent/gossiped peer book.  The reader
-            // promotes an observed-IP + advertised service-port endpoint only
-            // after a valid TRU VERSION handshake.
+                clientSock, clientIpString, clientPort, blockchain_, this);
+            peerManager_.addPeer(clientIpString, clientPort);
 
             bool admitted = false;
             {
@@ -202,14 +199,6 @@ void P2PNode::acceptLoop() {
 }
 
 bool P2PNode::connectToPeer(const std::string& ip, int port, int timeoutSec) {
-    // PEER-ENDPOINT-02: reject malformed endpoints before htons()/dial policy.
-    if (ip.empty() || port <= 0 || port > 65535) {
-        Logger::log(
-            "[PEER-ENDPOINT-02] Refusing invalid outbound endpoint " +
-            ip + ":" + std::to_string(port));
-        return false;
-    }
-
     if (stopping_.load()) {
         Logger::log(
             "[P2PNode] Outbound connection suppressed during shutdown: " +
@@ -416,11 +405,8 @@ bool P2PNode::connectToPeer(const std::string& ip, int port, int timeoutSec) {
 
     std::shared_ptr<PeerConnection> peer;
     try {
-        peer = std::make_shared<PeerConnection>(
-            sock, ip, port, blockchain_, this, false);
-        // PEER-ENDPOINT-02: even an outbound TCP connect is not peer-book
-        // authority until the remote side proves a valid TRU VERSION.  The
-        // PeerConnection promotes this already-dialed endpoint after handshake.
+        peer = std::make_shared<PeerConnection>(sock, ip, port, blockchain_, this);
+        peerManager_.addPeer(ip, port);
 
         bool admitted = false;
         {

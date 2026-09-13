@@ -17,8 +17,7 @@ class P2PNode;
 
 class PeerConnection {
 public:
-    PeerConnection(int sock, const std::string &ip, int port, Blockchain *chain,
-                   P2PNode *parent, bool inbound);
+    PeerConnection(int sock, const std::string &ip, int port, Blockchain *chain, P2PNode *parent);
     ~PeerConnection();
 
     void start();
@@ -67,9 +66,6 @@ private:
     int port_;
     Blockchain *blockchain_;
     P2PNode *parent_;
-    // PEER-ENDPOINT-02: inbound port_ is a transport/source port; outbound
-    // port_ is the endpoint we successfully dialed.
-    bool inbound_;
     std::thread readThread_;
     std::mutex promiseMutex_;
     std::map<uint64_t, std::promise<Block>> blockPromises_;

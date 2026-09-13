@@ -12,35 +12,9 @@
 #include <optional>
 #include <algorithm>
 
-namespace {
-// PEER-ENDPOINT-02: VERSION addrFrom is currently IPv4-style text.  For
-// inbound sessions we deliberately ignore its host portion (the socket gives
-// us the observed IP) and consume only a syntactically valid service port.
-std::optional<int> peerAdvertisedServicePort(const std::string& endpoint) {
-    const std::size_t colon = endpoint.rfind(':');
-    if (colon == std::string::npos || colon + 1 >= endpoint.size()) {
-        return std::nullopt;
-    }
 
-    const std::string text = endpoint.substr(colon + 1);
-    try {
-        std::size_t used = 0;
-        const int port = std::stoi(text, &used);
-        if (used != text.size() || port <= 0 || port > 65535) {
-            return std::nullopt;
-        }
-        return port;
-    } catch (...) {
-        return std::nullopt;
-    }
-}
-} // namespace
-
-
-PeerConnection::PeerConnection(int sock, const std::string &ip, int port,
-                               Blockchain *chain, P2PNode *parent, bool inbound)
-    : sock_(sock), ip_(ip), port_(port), blockchain_(chain), parent_(parent),
-      inbound_(inbound), running_(false), peerHeight_(0),
+PeerConnection::PeerConnection(int sock, const std::string &ip, int port, Blockchain *chain, P2PNode *parent)
+    : sock_(sock), ip_(ip), port_(port), blockchain_(chain), parent_(parent), running_(false), peerHeight_(0),
       lastActivity(std::chrono::steady_clock::now()),
       lastPing(std::chrono::steady_clock::now()),
       inboundByteTokens_(static_cast<double>(tru_limits::P2P_INBOUND_BYTE_BURST)),
@@ -672,34 +646,6 @@ void PeerConnection::readLoop() {
 
                             minerIPReportsSupported_.store((versionMsg.services() & tru_miner_telemetry::SERVICE_IP) != 0);
                             minerReportsSupported_.store((versionMsg.services() & tru_miner_telemetry::SERVICE) != 0);
-
-                            // PEER-ENDPOINT-02: promote only a VERIFIED TRU peer.
-                            // For outbound sessions, port_ is the endpoint that we
-                            // actually dialed successfully.  For inbound sessions,
-                            // port_ is only the remote TCP source port, so pair the
-                            // observed socket IP with the service port advertised in
-                            // the validated VERSION addrFrom field.
-                            std::optional<int> bookPort;
-                            if (inbound_) {
-                                bookPort = peerAdvertisedServicePort(versionMsg.addrfrom());
-                            } else if (port_ > 0 && port_ <= 65535) {
-                                bookPort = port_;
-                            }
-
-                            if (bookPort && parent_ &&
-                                !parent_->isSelfEndpoint(ip_, *bookPort)) {
-                                parent_->getPeerManager()->addPeer(ip_, *bookPort);
-                                Logger::log(
-                                    "[PEER-ENDPOINT-02] Promoted verified peer endpoint " +
-                                    ip_ + ":" + std::to_string(*bookPort) +
-                                    (inbound_ ? " from inbound VERSION" : " from successful outbound dial"));
-                            } else if (inbound_) {
-                                Logger::log(
-                                    "[PEER-ENDPOINT-02] Valid TRU VERSION from " + ip_ +
-                                    " but no valid advertised service port; live session retained, "
-                                    "peer-book promotion skipped");
-                            }
-
                             networkHandshakeComplete_.store(true);
                             Logger::log(
                                 "[PeerConnection::readLoop][Patch15B.1] "

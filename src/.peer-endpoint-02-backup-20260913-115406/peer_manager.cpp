@@ -9,25 +9,9 @@ PeerManager::PeerManager() {}
 PeerManager::~PeerManager() {}
 
 void PeerManager::addPeer(const std::string& ip, int port) {
-    // PEER-ENDPOINT-02: only syntactically valid endpoint ports enter the book.
-    // Do not guess whether a port is "ephemeral" from its numeric range; NATs
-    // may rewrite source ports from arbitrary ranges.
-    if (ip.empty() || port <= 0 || port > 65535) {
-        Logger::log(
-            "[PEER-ENDPOINT-02] Rejecting invalid peer endpoint " +
-            ip + ":" + std::to_string(port));
-        return;
-    }
-
     std::lock_guard<std::mutex> lock(mtx);
-
-    // The rest of this PeerManager is deliberately IP-keyed: connection slots,
-    // connected state, abuse state, and peers.dat persistence all operate per
-    // observed IP. Keep the book consistent with that model by retaining one
-    // reconnect/gossip endpoint per IP. A newly VERIFIED endpoint replaces the
-    // old endpoint for that same IP; it does not create source-port clutter.
     auto it = std::find_if(peers.begin(), peers.end(), [&](const PeerInfo& p) {
-        return p.ip == ip;
+        return p.ip == ip && p.port == port;
     });
 
     if (it == peers.end()) {
@@ -37,16 +21,8 @@ void PeerManager::addPeer(const std::string& ip, int port) {
             activeConnections_.find(ip) != activeConnections_.end(),
             time(nullptr)});
         Logger::log(
-            "[PeerManager] Added verified peer endpoint: " +
-            ip + ":" + std::to_string(port));
+            "[PeerManager] Added peer: " + ip + ":" + std::to_string(port));
     } else {
-        if (it->port != port) {
-            Logger::log(
-                "[PEER-ENDPOINT-02] Replacing peer endpoint for " + ip +
-                " from :" + std::to_string(it->port) +
-                " to :" + std::to_string(port));
-            it->port = port;
-        }
         it->isConnected =
             activeConnections_.find(ip) != activeConnections_.end();
         it->lastActive = time(nullptr);

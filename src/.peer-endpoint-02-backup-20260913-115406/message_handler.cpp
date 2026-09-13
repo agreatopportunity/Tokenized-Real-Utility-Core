@@ -601,17 +601,7 @@ void MessageHandler::handleMessage(const blockchain::BaseMessage& msg, Blockchai
                                     continue;
                                 }
 
-                                // PEER-ENDPOINT-02: ADDR is discovery input, not
-                                // peer-book authority.  Do not persist/gossip this
-                                // endpoint merely because another peer mentioned it.
-                                // connectToPeer() may attempt it under ADDR-DIAL-01;
-                                // only a valid TRU VERSION promotes it into the book.
-                                if (port <= 0 || port > 65535) {
-                                    Logger::log(
-                                        "[PEER-ENDPOINT-02] ADDR invalid port ignored: " +
-                                        ip + ":" + std::to_string(port));
-                                    continue;
-                                }
+                                node->getPeerManager()->addPeer(ip, port);
 
                                 // ADDR-DIAL-01: bounded, attempt-counted dial.
                                 // dialsThisMessage is a local, so the cap is
