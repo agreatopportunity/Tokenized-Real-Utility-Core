@@ -8724,7 +8724,43 @@ void startRPCServer(Blockchain &chain, Wallet &wallet, P2PNode &node, int port,
         }
         json request; int id=0; try{request=json::parse(req.body); id=request.value("id",0);}catch(...){res.set_content(makeError(-32700,"Parse error").dump(2),"application/json");return;}
         std::string m=request.value("method",""); json params=request.value("params",json::object()); json response;
-        if (!consumeRpcBucket(g_rpcRateBuckets, req.remote_addr, rpcMethodCost(m), 240.0, 4.0)) {
+
+        // RPC-RATE-06: the privileged Core RPC listens on loopback, so native
+        // miners, tru-cli and the public Explorer/Wallet gateway all arrive as
+        // the same transport address (normally 127.0.0.1).  A single bucket for
+        // that address allowed a busy native miner to consume the budget needed
+        // by browser mining.  Keep the existing capacity/refill/cost policy, but
+        // isolate independent RPC lanes.  Public browser traffic is still
+        // protected by the existing per-client public-gateway limiter before it
+        // reaches Core.
+        std::string rpcRateKey = req.remote_addr + "|" + m;
+        if (m == "getblocktemplate" &&
+            params.contains("browserMinerAddress") &&
+            params["browserMinerAddress"].is_string()) {
+            const std::string browserMiner =
+                params["browserMinerAddress"].get<std::string>();
+            if (!browserMiner.empty() && browserMiner.size() <= 128U) {
+                rpcRateKey += "|browser-miner|" + browserMiner;
+            }
+        } else if ((m == "reportmineractivity" ||
+                    m == "registerminer" ||
+                    m == "unregisterminer") &&
+                   params.contains("minerAddress") &&
+                   params["minerAddress"].is_string()) {
+            const std::string minerAddress =
+                params["minerAddress"].get<std::string>();
+            if (!minerAddress.empty() && minerAddress.size() <= 128U) {
+                rpcRateKey += "|miner|" + minerAddress;
+            }
+        } else if (m == "submitblock" &&
+                   params.contains("browserCandidate")) {
+            // Browser submissions are already constrained by the public gateway
+            // and normal authoritative block validation.  Keep their Core RPC
+            // budget separate from native submitblock traffic.
+            rpcRateKey += "|browser-miner";
+        }
+
+        if (!consumeRpcBucket(g_rpcRateBuckets, rpcRateKey, rpcMethodCost(m), 240.0, 4.0)) {
             res.status = 429;
             res.set_header("Retry-After", "1");
             res.set_content("{\"error\":\"RPC request rate limit exceeded\"}\n", "application/json");
