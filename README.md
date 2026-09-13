@@ -872,6 +872,14 @@ to toggle between **FULL** and **COMPACT** menu modes.
 
 The menu uses absolute terminal positioning so it does not continually scroll or stack duplicate copies. Chain information, the TRU banner, command output, and mining dashboard occupy separate screen areas.
 
+### Full menu
+
+![TRU Core full menu](docs/img/tru-cli-menu-full.png)
+
+### Compact menu
+
+![TRU Core compact menu](docs/img/tru-cli-menu-compact.png)
+
 ### Interactive operations
 
 The current menu exposes:
