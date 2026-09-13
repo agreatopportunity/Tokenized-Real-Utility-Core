@@ -10,6 +10,11 @@
 #include <openssl/sha.h>
 #include <optional>
 #include <cctype>
+#include <chrono>          // ADDR-DIAL-01
+#include <deque>           // ADDR-DIAL-01
+#include <mutex>           // ADDR-DIAL-01
+#include <unordered_map>   // ADDR-DIAL-01
+#include <iterator>        // ADDR-DIAL-01 (std::next)
 
 namespace {
 // Patch 15B.1 wire integers are explicit little-endian, independent of host ABI.
@@ -355,6 +360,119 @@ blockchain::BaseMessage MessageHandler::createGetHeightRequest() {
 }
 
 // Handle received messages
+
+// ===========================================================================
+// ADDR-DIAL-01
+//
+// The ADDR handler runs on the PeerConnection reader thread
+// (peer_connection.cpp: readThread_ -> readLoop -> handleMessage). Dialling a
+// peer from here blocks that thread for the whole connect timeout, during
+// which the socket is not read, so GET_HEIGHT and block traffic stall.
+//
+// The previous code counted only SUCCESSFUL dials against its cap:
+//
+//     if (newConnectionCount < MAX_NEW_CONNECTIONS)
+//         if (node->connectToPeer(ip, port))
+//             newConnectionCount++;
+//
+// so unreachable addresses cost the default 5s each and never consumed the
+// budget. A 50-address ADDR from an unreachable network could hold the reader
+// for over four minutes. The cap was loosest exactly when the network was
+// worst.
+//
+// Those counters were also function-static, i.e. shared by every reader
+// thread with no synchronisation - a data race, and "per message" was untrue.
+//
+// This governor replaces them with mutex-guarded shared state that bounds the
+// reader-thread cost absolutely:
+//
+//   - attempts are counted, not successes
+//   - at most ADDR_DIAL_MAX_PER_MESSAGE dials per ADDR message
+//   - at most ADDR_DIAL_MAX_PER_MINUTE dials across ALL connections
+//   - a failed endpoint is not retried for ADDR_DIAL_COOLDOWN_SECONDS
+//   - dials use a short timeout instead of the 5s default
+//
+// Worst case reader stall: ADDR_DIAL_MAX_PER_MESSAGE * ADDR_DIAL_TIMEOUT_SECONDS
+// = 2 seconds, versus 250 seconds before.
+// ===========================================================================
+namespace {
+
+constexpr int         ADDR_DIAL_TIMEOUT_SECONDS   = 1;
+constexpr int         ADDR_DIAL_MAX_PER_MESSAGE   = 2;
+constexpr std::size_t ADDR_DIAL_MAX_PER_MINUTE    = 6;
+constexpr int         ADDR_DIAL_COOLDOWN_SECONDS  = 900;
+constexpr std::size_t ADDR_DIAL_MAX_COOLDOWN_KEYS = 512;
+
+class AddrDialGovernor {
+public:
+    using Clock     = std::chrono::steady_clock;
+    using TimePoint = Clock::time_point;
+
+    // Permitted only if the endpoint is not cooling down AND the global
+    // per-minute attempt budget has room. Records the attempt on success.
+    bool tryReserve(const std::string& key) {
+        const TimePoint now = Clock::now();
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        while (!attempts_.empty() &&
+               now - attempts_.front() >= std::chrono::minutes(1)) {
+            attempts_.pop_front();
+        }
+
+        const auto it = cooldown_.find(key);
+        if (it != cooldown_.end()) {
+            if (now < it->second) {
+                return false;
+            }
+            cooldown_.erase(it);
+        }
+
+        if (attempts_.size() >= ADDR_DIAL_MAX_PER_MINUTE) {
+            return false;
+        }
+
+        attempts_.push_back(now);
+        return true;
+    }
+
+    // A dial that failed: suppress this endpoint for a while.
+    void penalize(const std::string& key) {
+        const TimePoint now = Clock::now();
+        std::lock_guard<std::mutex> lock(mutex_);
+
+        for (auto it = cooldown_.begin(); it != cooldown_.end();) {
+            it = (now >= it->second) ? cooldown_.erase(it) : std::next(it);
+        }
+
+        // Hard ceiling so a hostile ADDR flood cannot grow this map.
+        if (cooldown_.size() >= ADDR_DIAL_MAX_COOLDOWN_KEYS) {
+            return;
+        }
+
+        cooldown_[key] =
+            now + std::chrono::seconds(ADDR_DIAL_COOLDOWN_SECONDS);
+    }
+
+    // A dial that succeeded: clear any suppression.
+    void clear(const std::string& key) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        cooldown_.erase(key);
+    }
+
+private:
+    std::mutex mutex_;
+    std::deque<TimePoint> attempts_;
+    std::unordered_map<std::string, TimePoint> cooldown_;
+};
+
+AddrDialGovernor& addrDialGovernor() {
+    static AddrDialGovernor governor;
+    return governor;
+}
+
+} // namespace
+
+
 void MessageHandler::handleMessage(const blockchain::BaseMessage& msg, Blockchain* chain, P2PNode* node) {
     if (!chain || !node) {
         Logger::log("[MessageHandler] Error: Null chain or node pointer");
@@ -460,6 +578,8 @@ void MessageHandler::handleMessage(const blockchain::BaseMessage& msg, Blockchai
 
                     Logger::log("[MessageHandler] Received ADDR with " + std::to_string(addrMsg.addresses_size()) + " addresses");
                     
+                    int dialsThisMessage = 0;
+
                     for (const auto& addr : addrMsg.addresses()) {
                         size_t colonPos = addr.find(':');
                         if (colonPos != std::string::npos) {
@@ -482,23 +602,28 @@ void MessageHandler::handleMessage(const blockchain::BaseMessage& msg, Blockchai
                                 }
 
                                 node->getPeerManager()->addPeer(ip, port);
-                                
-                                // Try to connect to new peers (with a limit)
-                                static const int MAX_NEW_CONNECTIONS = 3; // Limit new connections per message
-                                static int newConnectionCount = 0;
-                                
-                                if (newConnectionCount < MAX_NEW_CONNECTIONS) {
-                                    if (node->connectToPeer(ip, port)) {
-                                        newConnectionCount++;
+
+                                // ADDR-DIAL-01: bounded, attempt-counted dial.
+                                // dialsThisMessage is a local, so the cap is
+                                // genuinely per message; the governor bounds
+                                // the global rate across all reader threads.
+                                if (dialsThisMessage < ADDR_DIAL_MAX_PER_MESSAGE) {
+                                    const std::string dialKey =
+                                        ip + ":" + std::to_string(port);
+
+                                    if (addrDialGovernor().tryReserve(dialKey)) {
+                                        ++dialsThisMessage;   // count the ATTEMPT
+                                        if (node->connectToPeer(
+                                                ip, port,
+                                                ADDR_DIAL_TIMEOUT_SECONDS)) {
+                                            addrDialGovernor().clear(dialKey);
+                                        } else {
+                                            addrDialGovernor().penalize(dialKey);
+                                            Logger::log(
+                                                "[ADDR-DIAL-01] dial failed, "
+                                                "cooling down " + dialKey);
+                                        }
                                     }
-                                }
-                                
-                                // Reset counter periodically
-                                static time_t lastReset = 0;
-                                time_t now = time(nullptr);
-                                if (now - lastReset > 300) { // 5 minutes
-                                    newConnectionCount = 0;
-                                    lastReset = now;
                                 }
                             } catch (const std::exception& e) {
                                 Logger::log("[MessageHandler] Invalid port in address: " + addr);

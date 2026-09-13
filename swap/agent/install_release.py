@@ -225,7 +225,7 @@ def build(root: Path, manifest: dict) -> tuple[Path, Path, Path, Path]:
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_bytes(raw)
     (source / "tru.conf").write_text(
-        "[network]\nrpcbind=127.0.0.1\nrpcport=8332\np2pPort=8333\nlisten=1\nrpcMaxConnections=32\n",
+        "[network]\nrpcbind=127.0.0.1\nrpcport=21832\np2pPort=21833\nlisten=1\nrpcMaxConnections=32\n",
         encoding="utf-8",
     )
     output = work / "build"
