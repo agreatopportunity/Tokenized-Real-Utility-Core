@@ -1294,29 +1294,51 @@ The explorer can run with the node or as a standalone explorer process against t
 
 ## Dependencies
 
-Core dependencies include:
+Linux, 2 GB RAM minimum (plus swap), roughly 10 minutes.
 
-- C++17 compiler
-- CMake
-- OpenSSL
-- libsodium
-- LevelDB
-- Protobuf
-- libwally-core
-- libcurl
-- nlohmann/json
-- cpp-httplib
-- cxxopts
-- OpenCL for GPU mining
-- Qt when building the desktop GUI
+```bash
+./install-deps.sh          # once per machine
+```
+
+Installs the C++17 toolchain, CMake, OpenSSL, libsodium, LevelDB, Protobuf,
+Boost, libcurl, libfmt, jsoncpp — then builds crc32c, ethash, libwally-core
+and cxxopts from source. OpenCL is needed only for GPU mining; Qt only for
+the desktop GUI.
+
+Check without installing anything:
+
+```bash
+./install-deps.sh --check
+```
+
+**Deactivate conda first.** TRU's C++ build uses system packages only. An
+active conda environment puts its own cmake, protobuf, leveldb and libstdc++
+ahead of the system ones, producing link errors or a binary that runs on that
+machine and nowhere else. Both scripts refuse to run while one is active.
 
 ## Build
 
-The project includes a rebuild workflow:
-
 ```bash
 cd ~/NEW_TRU
-./rebuild.sh
+./agnostic_rebuild.sh
+```
+
+Binaries land in:
+
+```text
+build-native/bin/
+```
+
+**Use `agnostic_rebuild.sh`, not `rebuild.sh`.** `rebuild.sh` runs
+`rm -rf build-native`, and a native wallet lives in `build-native/bin/`.
+`agnostic_rebuild.sh` preserves the encrypted wallet set through
+`~/.local/share/tru/wallet/` and restores it after the build.
+
+Back up your wallet before any rebuild:
+
+```bash
+tar czf ~/tru-wallet-$(date +%F).tgz -C ~/NEW_TRU/build-native/bin \
+  tru.dat.enc tru.dat.public wallet_seed.dat.enc
 ```
 
 Binaries are produced under the native build output, typically:

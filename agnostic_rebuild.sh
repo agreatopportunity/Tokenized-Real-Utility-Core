@@ -197,10 +197,33 @@ chmod 700 "$TRU_DATA_HOME" "$WALLET_STORE" "$RUNTIME_STORE"
 # ---------------------------------------------------------------------------
 # Preflight.
 # ---------------------------------------------------------------------------
-for cmd in cmake sha256sum install; do
+# conda ships its own cmake, protobuf, leveldb and libstdc++. Activated, they
+# shadow the system toolchain and yield link errors or a binary with a
+# mismatched ABI that only runs on this machine.
+if [[ -n "${CONDA_PREFIX:-}" ]]; then
+    fail "conda environment '${CONDA_DEFAULT_ENV:-?}' is active.
+       It shadows the system toolchain. Run 'conda deactivate' and retry.
+       TRU's C++ build uses system packages only."
+fi
+
+for cmd in cmake sha256sum install protoc git; do
     command -v "$cmd" >/dev/null 2>&1 ||
-        fail "required command is not installed: $cmd"
+        fail "required command is not installed: $cmd
+       Run ./install-deps.sh first."
 done
+
+# Check the libraries too, not just the commands. Without this a missing
+# -dev package surfaces as a wall of CMake errors instead of one sentence.
+if command -v c++ >/dev/null 2>&1; then
+    for hdr in openssl/evp.h leveldb/db.h cxxopts.hpp ethash/keccak.hpp; do
+        echo "#include <$hdr>" | c++ -E -x c++ - >/dev/null 2>&1 ||
+            fail "missing build dependency header: $hdr
+       Run ./install-deps.sh first."
+    done
+    echo 'int main(){return 0;}' | c++ -x c++ - -lkeccak -o /dev/null >/dev/null 2>&1 ||
+        fail "libkeccak not found (provided by ethash)
+       Run ./install-deps.sh first."
+fi
 
 [[ -f "$REPO_ROOT/CMakeLists.txt" ]] ||
     fail "CMakeLists.txt not found next to rebuild.sh: $REPO_ROOT"
