@@ -7,7 +7,7 @@ set(TRU_CONFIG_SOURCE "${CMAKE_SOURCE_DIR}/tru.conf")
 
 if(NOT EXISTS "${TRU_CONFIG_SOURCE}")
     if(EXISTS "${CMAKE_SOURCE_DIR}/tru.conf.dockers")
-        set(TRU_CONFIG_SOURCE "${CMAKE_SOURCE_DIR}/tru.conf.dockers")
+        set(TRU_CONFIG_SOURCE "${CMAKE_SOURCE_DIR}/tru.conf.example")
     elseif(EXISTS "${CMAKE_SOURCE_DIR}/tru.conf.example")
         set(TRU_CONFIG_SOURCE "${CMAKE_SOURCE_DIR}/tru.conf.example")
     else()
