@@ -2616,7 +2616,6 @@ exit_sync:
 void Blockchain::invalidateCachedBalance(const std::string& address) {
     {
         std::unique_lock<std::shared_mutex> lock(addressCacheMutex);
-        ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
         addressCache.erase(address);
     }
     Logger::log("[Blockchain] Invalidated cached balance for " + address);
@@ -2627,7 +2626,6 @@ void Blockchain::invalidateCachedBalance(const std::string& address) {
 void Blockchain::invalidateAddressCache(const std::string& address) {
     {
         std::unique_lock<std::shared_mutex> lock(addressCacheMutex);
-        ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
         addressCache.erase(address);
     }
     Logger::log("[Blockchain] Invalidated address cache for " + address);
@@ -10894,7 +10892,6 @@ bool Blockchain::recoverInterruptedReorgWithSubmissionLockHeld(
                 const size_t rebuiltCount = rebuiltAddressCache.size();
                 {
                     std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-                    ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
                     addressCache.swap(rebuiltAddressCache);
                 }
                 Logger::log(
@@ -17068,7 +17065,6 @@ bool Blockchain::connectTipBlock(
 
             {
                 std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-                ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
                 addressCache[addr].balance = balanceTru;
                 addressCache[addr].txCount = txCount;
             }
@@ -18881,7 +18877,6 @@ bool Blockchain::applyBlock(
 
         {
             std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-            ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
             addressCache[addr].balance = newBalTru;
             addressCache[addr].txCount = newCount;
         }
@@ -20313,7 +20308,6 @@ bool Blockchain::rollbackBlockWithSubmissionLockHeld(
         const size_t rebuiltCount = rebuiltAddressCache.size();
         {
             std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-            ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
             addressCache.swap(rebuiltAddressCache);
         }
         Logger::log(
@@ -22208,7 +22202,6 @@ void Blockchain::invalidateCachesForAcceptedMempoolTransaction(const Transaction
         // Clear address cache (which includes balance)
         {
             std::unique_lock<std::shared_mutex> lock(addressCacheMutex);
-            ++addressCacheRevision; // EXPLORER-LOCK-01: reject stale warmup writes.
             if (addressCache.erase(addr) > 0) {
                 Logger::log("[Blockchain] Cleared cached data for address: " + addr);
             }
@@ -22645,10 +22638,8 @@ void Blockchain::startExplorerServer(int port, int rpcPort) {
     int64_t tokenCacheTimestamp = 0;
     const int64_t cacheTTL = 60 * 1000;
     {
-        // EXPLORER-LOCK-01: never hold addressCacheMutex across database,
-        // balance, chain or mempool calls. Block application takes chain -> cache.
-        // Warmup uses optimistic revision checks; live writes/invalidations win.
-        size_t deferredCacheEntries = 0;
+        // exclusive lock on shared_mutex
+        std::lock_guard<std::shared_mutex> cacheLock(addressCacheMutex);
 
         // derive the ADDRESS from the index key instead of
         // keeping the whole remainder of the key.
@@ -22710,11 +22701,6 @@ void Blockchain::startExplorerServer(int port, int rpcPort) {
         // rescans the whole address index, so startup was quadratic in the
         // number of UTXOs.
         for (const auto& addr : cacheAddrs) {
-            uint64_t observedCacheRevision = 0;
-            {
-                std::shared_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-                observedCacheRevision = addressCacheRevision;
-            }
             // read txCount with the SAME API applyBlock writes
             // it with. applyBlock Phase 6 uses putWithDataChecksum, which
             // stores "<checksum>|<value>". A plain get() therefore returned a
@@ -22747,21 +22733,7 @@ void Blockchain::startExplorerServer(int port, int rpcPort) {
                 Logger::log("[startExplorerServer] Balance failed for " + addr);
             }
 
-            {
-                std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-                if (addressCacheRevision == observedCacheRevision) {
-                    addressCache[addr] = { bal, txc };
-                    ++addressCacheRevision;
-                } else {
-                    // No stale overwrite or resurrection after a concurrent erase
-                    // or rollback. Address-detail misses calculate outside the lock.
-                    ++deferredCacheEntries;
-                }
-            }
-        }
-        if (deferredCacheEntries != 0) {
-            Logger::log("[EXPLORER-LOCK-01] Startup cache entries deferred after "
-                        "concurrent changes: " + std::to_string(deferredCacheEntries));
+            addressCache[addr] = { bal, txc };
         }
     }
 
@@ -23110,23 +23082,20 @@ g_explorerServer.Get(
         Logger::log("[Explorer /api/address] Request for address: " + address);
         double balance = 0.0;
         int txCount = 0;
-        bool cacheHit = false;
         {
-            std::shared_lock<std::shared_mutex> lock(addressCacheMutex);
+            std::shared_lock lock(addressCacheMutex);
             auto it = this->addressCache.find(address);
             if (it != this->addressCache.end()) {
                 balance = it->second.balance;
                 txCount = it->second.txCount;
-                cacheHit = true;
-            }
-        } // EXPLORER-LOCK-01: release cache lock BEFORE calculate_balance().
-        if (!cacheHit) {
-            try {
-                uint64_t satoshis = calculate_balance(address);
-                balance = static_cast<double>(satoshis) / 100000000.0;
-            } catch (const std::exception& e) {
-                Logger::log("[Explorer /api/address] Balance error: " + std::string(e.what()));
-                balance = 0.0;
+            } else {
+                try {
+                    uint64_t satoshis = calculate_balance(address);
+                    balance = static_cast<double>(satoshis) / 100000000.0;
+                } catch (const std::exception& e) {
+                    Logger::log("[Explorer /api/address] Balance error: " + std::string(e.what()));
+                    balance = 0.0;
+                }
             }
         }
         std::unordered_set<std::string> allTxids;

@@ -641,9 +641,6 @@ private:
 
     std::unordered_map<std::string, AddressStats> addressCache;
     mutable std::shared_mutex addressCacheMutex;
-    // EXPLORER-LOCK-01: guarded by addressCacheMutex; derived cache only.
-    // Every write/erase/swap advances this revision. No chain/DB serialization.
-    uint64_t addressCacheRevision{0};
     std::string chainName;
     std::string ticker;
     std::string version;
