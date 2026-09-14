@@ -1227,12 +1227,15 @@ bool mineBlockGPU_21E8_AutoTuned(Block& candidate, uint64_t maxNonce, httplib::C
     // INTELLIGENT: Enhanced device mining threads with AUTO-TUNED settings
     std::vector<std::thread> deviceThreads;
 
-    // GPU-MINER-HARDEN-01: partition the complete uint32 nonce space as
-    // exact half-open ranges. For maxNonce=0xffffffff this is 2^32 nonces.
+    // MINER-TIME-01B: performance-preserving fresh-template sweep.
+    // Search the complete uint32 nonce space once, then return immediately to
+    // the outer loop for a fresh getblocktemplate. This preserves sustained
+    // GPU occupancy while retaining the >30s stale-solution rejection gate.
     const uint64_t totalNonces = maxNonce + 1ULL;
+    const uint64_t sweepNonces = totalNonces;
     const uint64_t deviceCount = static_cast<uint64_t>(g_devices.size());
-    const uint64_t baseNoncesPerDevice = totalNonces / deviceCount;
-    const uint64_t remainderNonces = totalNonces % deviceCount;
+    const uint64_t baseNoncesPerDevice = sweepNonces / deviceCount;
+    const uint64_t remainderNonces = sweepNonces % deviceCount;
 
     uint64_t partitionCursor = 0;
     for (size_t i = 0; i < g_devices.size(); i++) {
@@ -1616,6 +1619,27 @@ bool mineBlockGPU_21E8_AutoTuned(Block& candidate, uint64_t maxNonce, httplib::C
     printModernGPUInterface(candidate.height, g_devices, finalHashRate, elapsed, finalHashes,
                           1, 1, false, minerAddr, blockCount, g_found.load());
     
+    // MINER-TIME-01A hard freshness gate. Even if an OpenCL driver/device
+    // takes unexpectedly long to drain queued work, a solution from a
+    // candidate held for more than 30 seconds is discarded instead of being
+    // submitted with an old template timestamp.
+    constexpr double kMaxGpuCandidateHoldSeconds = 30.0;
+    if (g_found.load() && elapsed > kMaxGpuCandidateHoldSeconds) {
+        Logger::log(formatLogMessage(
+            "WARNING", "MINER-TIME-01A",
+            "GPU solution discarded: candidate was held for " +
+            std::to_string(elapsed) +
+            "s (>30s); requesting fresh getblocktemplate"));
+        std::cout << C_WARNING
+                  << "[AI MINING] " << SYMBOL_WARNING
+                  << " Stale GPU solution discarded after "
+                  << std::fixed << std::setprecision(1) << elapsed
+                  << "s; refreshing template"
+                  << C_RESET << "\n";
+        g_found.store(false);
+        return false;
+    }
+
     if (g_found.load()) {
         std::string headerLine = std::string(65, '=');
         std::cout << "\n" << C_FIRE << C_BOLD << BG_SUCCESS;
@@ -1736,6 +1760,13 @@ static void startGPUMiningLoop(const std::string& nodeIP, int nodePort, const st
     cli.set_connection_timeout(5, 0);
     cli.set_read_timeout(20, 0);
     int extraNonce = 0;
+
+    // MINER-TIME-01B: one full uint32 GPU sweep per fresh getblocktemplate.
+    // Same-tip refreshes advance extraNonce so each new template searches a
+    // different coinbase / merkle-root / header space.
+    int32_t lastTemplateHeight = -1;
+    std::string lastTemplatePrevHash;
+
     int retryCount = 0;
     uint64_t blockCount = 0;
     const int maxRetries = 3;
@@ -1881,17 +1912,55 @@ static void startGPUMiningLoop(const std::string& nodeIP, int nodePort, const st
 
             retryCount = 0; // Reset retry count on success
             
-            nlohmann::json tplJson = nlohmann::json::parse(tplRes->body).value("result", nlohmann::json());
-            Block candidate = buildCandidateBlockFromTemplate(tplJson, minerAddr, extraNonce);
-            bool success = mineBlockGPU_21E8_AutoTuned(candidate, maxNonce, cli, minerAddr, extraNonce, blockCount);
+            nlohmann::json tplJson =
+                nlohmann::json::parse(tplRes->body).value(
+                    "result",
+                    nlohmann::json()
+                );
 
-            // Try different extraNonce values if needed
-            while (!success && extraNonce < 1000 && !g_shutdown.load()) {
-                extraNonce++;
-                Logger::log(formatLogMessage("INFO", "MAIN", "Trying with extraNonce: " + std::to_string(extraNonce)));
-                candidate = buildCandidateBlockFromTemplate(tplJson, minerAddr, extraNonce);
-                success = mineBlockGPU_21E8_AutoTuned(candidate, maxNonce, cli, minerAddr, extraNonce, blockCount);
+            const int32_t templateHeight = tplJson.value("height", 1);
+            const std::string templatePrevHash = tplJson.value(
+                "previousblockhash",
+                "0000000000000000000000000000000000000000000000000000000000000000"
+            );
+
+            if (templateHeight != lastTemplateHeight ||
+                templatePrevHash != lastTemplatePrevHash) {
+                extraNonce = 0;
+                lastTemplateHeight = templateHeight;
+                lastTemplatePrevHash = templatePrevHash;
+                Logger::log(formatLogMessage(
+                    "INFO", "MINER-TIME-01A",
+                    "Fresh GPU tip/template: height=" +
+                    std::to_string(templateHeight) +
+                    ", resetting extraNonce=0"));
+            } else {
+                extraNonce = (extraNonce >= 1000) ? 0 : (extraNonce + 1);
+                Logger::log(formatLogMessage(
+                    "INFO", "MINER-TIME-01A",
+                    "Same GPU tip; fresh template acquired; advancing extraNonce=" +
+                    std::to_string(extraNonce)));
             }
+
+            Block candidate =
+                buildCandidateBlockFromTemplate(
+                    tplJson,
+                    minerAddr,
+                    extraNonce
+                );
+
+            // Exactly one full uint32 GPU sweep per newly fetched GBT. A
+            // miss returns immediately to this outer loop, fetches a fresh
+            // curtime, and advances extraNonce if the tip is unchanged.
+            bool success =
+                mineBlockGPU_21E8_AutoTuned(
+                    candidate,
+                    maxNonce,
+                    cli,
+                    minerAddr,
+                    extraNonce,
+                    blockCount
+                );
 
             if (success) {
                 Logger::log(formatLogMessage("SUCCESS", "MAIN", "Block found! Submitting to network..."));
@@ -1961,8 +2030,9 @@ static void startGPUMiningLoop(const std::string& nodeIP, int nodePort, const st
                 }
             }
 
-            extraNonce = 0;
-            std::this_thread::sleep_for(std::chrono::seconds(2));
+            // MINER-TIME-01B: template identity above owns extraNonce
+            // reset/advance. Do not impose a fixed post-sweep idle delay;
+            // immediately request the next fresh getblocktemplate.
             
         } catch (const std::exception &e) {
             Logger::log(formatLogMessage("ERROR", "MAIN", "Exception in mining loop: " + std::string(e.what())));

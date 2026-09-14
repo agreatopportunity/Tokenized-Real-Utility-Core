@@ -637,6 +637,14 @@ static bool mineBlockCPU_21E8(Block& candidate, uint64_t maxNonce, int nThreads,
     std::atomic<uint64_t> totalHashes(0);
     std::vector<uint64_t> threadNonces(nThreads, 0);
     std::atomic<int> miningStatus(0);
+
+    // MINER-TIME-01A: bound one CPU candidate to 30 seconds of local work.
+    // A fresh getblocktemplate is fetched after this attempt ends, so the
+    // miner does not keep hashing an increasingly stale header timestamp.
+    std::atomic<bool> refreshRequested(false);
+    const auto workStartedAt = std::chrono::steady_clock::now();
+    constexpr auto kMaxCandidateWorkAge = std::chrono::seconds(30);
+
     // REMOVED: uint64_t blockCount = 0; - Now using the passed reference
 
     // reset only per-attempt solution state.
@@ -666,7 +674,21 @@ static bool mineBlockCPU_21E8(Block& candidate, uint64_t maxNonce, int nThreads,
         // reused stack buffer, see doubleSha256_21E8 overload.
         unsigned char finalHash[32];
         
-        for (uint64_t nonce = tid; nonce < maxNonce && !found.load() && !g_shutdown.load(); nonce += nThreads) {
+        for (uint64_t nonce = tid;
+             nonce < maxNonce &&
+             !found.load(std::memory_order_relaxed) &&
+             !refreshRequested.load(std::memory_order_relaxed) &&
+             !g_shutdown.load();
+             nonce += nThreads) {
+
+            // Check the steady-clock deadline periodically rather than on every
+            // hash, keeping hot-loop overhead negligible.
+            if ((localHashCount & 0xFFFFULL) == 0ULL &&
+                std::chrono::steady_clock::now() - workStartedAt >= kMaxCandidateWorkAge) {
+                refreshRequested.store(true, std::memory_order_relaxed);
+                break;
+            }
+
             localHdr[76] = (unsigned char)(nonce & 0xff);
             localHdr[77] = (unsigned char)((nonce >> 8) & 0xff);
             localHdr[78] = (unsigned char)((nonce >> 16) & 0xff);
@@ -726,6 +748,19 @@ static bool mineBlockCPU_21E8(Block& candidate, uint64_t maxNonce, int nThreads,
                            candidate.header.bits);  // pass real difficulty bits
 
     for (auto& t : threads) t.join();
+
+    // Hard closeout gate: even if a worker was delayed by scheduling after the
+    // periodic deadline check, never submit work held beyond the 30s bound.
+    const auto workEndedAt = std::chrono::steady_clock::now();
+    if (found.load() && workEndedAt - workStartedAt > kMaxCandidateWorkAge) {
+        Logger::log(
+            "[MINER-TIME-01A] CPU solution discarded because candidate work age "
+            "exceeded 30 seconds; requesting fresh getblocktemplate");
+        found.store(false);
+        g_found.store(false);
+        refreshRequested.store(true, std::memory_order_relaxed);
+    }
+
     if (found.load()) {
         miningStatus.store(1);
         candidate.header.nonce = foundNonce;
@@ -735,7 +770,13 @@ static bool mineBlockCPU_21E8(Block& candidate, uint64_t maxNonce, int nThreads,
                    ", Hash: " + candidate.blockHash);
     } else {
         miningStatus.store(2);
-        Logger::log("[MINING] No solution found within nonce range");
+        if (refreshRequested.load(std::memory_order_relaxed)) {
+            Logger::log(
+                "[MINER-TIME-01A] CPU candidate age limit reached; "
+                "requesting fresh getblocktemplate");
+        } else {
+            Logger::log("[MINING] No solution found within nonce range");
+        }
     }
     progThread.join();
 
@@ -1029,9 +1070,9 @@ static void startMiningLoop(const std::string& nodeIP, int nodePort, const std::
                     extraNonce
                 );
 
-            // Perform ONE full nonce-space attempt for this fresh template.
-            // If no solution is found, execution falls through and the outer
-            // loop requests getblocktemplate again before doing more work.
+            // MINER-TIME-01A: one bounded work attempt per fresh template.
+            // At ~30 seconds the workers stop cleanly and the outer loop asks
+            // the node for a new template (including a fresh curtime).
             bool success =
                 mineBlockCPU_21E8(
                     candidate,
