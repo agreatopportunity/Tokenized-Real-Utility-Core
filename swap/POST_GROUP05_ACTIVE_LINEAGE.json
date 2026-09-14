@@ -65,7 +65,7 @@
     "version": "TRU-MULTINODE-01E"
   },
   "pins": {
-    "src/blockchain.cpp": "a4db3c20ad2ee9aacf76492ec46fa634645114f8ea26c4a0c942d1b7051cbfd1",
+    "src/blockchain.cpp": "31c1bde58d2d964735feace0161dbca894e3c09bd1248102e521884dcaac3eb1",
     "src/blockchain.h": "16f3615c2bdb18a452cbe5ca7153f22850a6269ac8076101d880a794158de0f1",
     "src/main.cpp": "052a078c8f665e9a1df0260632358605cd51284a76cb8c25b06f8fe51535c981",
     "src/mempool.cpp": "e05988b2976cb9682232aa8c0c472d87a013382603da0e92ee432e6c60f72c53",

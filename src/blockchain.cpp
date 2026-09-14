@@ -10829,11 +10829,75 @@ bool Blockchain::recoverInterruptedReorgWithSubmissionLockHeld(
                     "final E2 marker-clear readback failed: " + finalReason);
             }
 
-            {
-                std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-                addressCache.clear();
-            }
+            // [EXPLORER-ADDRESS-01] Durable-derived explorer cache repair.
+            // Build a complete replacement OFF-LOCK, then publish it atomically.
+            // This changes no confirmed state; it only reconstructs addressCache.
             invalidateUTXOCache();
+            {
+                std::unordered_set<std::string> explorerAddressSet;
+                dbStorage.iteratePrefix("address:", [&](const std::string& key, const std::string&) {
+                    std::string rest = key;
+                    if (rest.rfind("address:", 0) == 0) {
+                        rest = rest.substr(sizeof("address:") - 1);
+                    }
+
+                    // Mirror explorer-startup parsing: reject canonical contract outpoints
+                    // before slicing the first ':' as the TRU address boundary.
+                    const size_t firstColon = rest.find(':');
+                    const size_t secondColon = firstColon == std::string::npos
+                        ? std::string::npos
+                        : rest.find(':', firstColon + 1);
+                    if (firstColon != std::string::npos &&
+                        secondColon != std::string::npos &&
+                        tru_contract_state::IsCanonicalContractOutpoint(
+                            rest.substr(0, secondColon))) {
+                        return;
+                    }
+
+                    const std::string addr = (firstColon == std::string::npos)
+                        ? rest
+                        : rest.substr(0, firstColon);
+                    if (!addr.empty() && isValidAddress(addr)) {
+                        explorerAddressSet.insert(addr);
+                    }
+                });
+
+                decltype(addressCache) rebuiltAddressCache;
+                for (const auto& addr : explorerAddressSet) {
+                    int txCount = 0;
+                    std::string rawCount;
+                    if (dbStorage.getWithDataChecksum(
+                        "address:" + addr + ":txCount", rawCount)) {
+                        try { txCount = std::stoi(rawCount); }
+                        catch (...) { txCount = 0; }
+                    }
+
+                    double balanceTru = 0.0;
+                    try {
+                        const uint64_t atoms = calculate_balance(addr);
+                        balanceTru = static_cast<double>(atoms) / 100000000.0;
+                    } catch (const std::exception& e) {
+                        Logger::log(
+                            "[EXPLORER-ADDRESS-01] balance rebuild failed for " +
+                            addr + ": " + e.what());
+                    } catch (...) {
+                        Logger::log(
+                            "[EXPLORER-ADDRESS-01] balance rebuild failed for " + addr);
+                    }
+
+                    rebuiltAddressCache[addr].balance = balanceTru;
+                    rebuiltAddressCache[addr].txCount = txCount;
+                }
+
+                const size_t rebuiltCount = rebuiltAddressCache.size();
+                {
+                    std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
+                    addressCache.swap(rebuiltAddressCache);
+                }
+                Logger::log(
+                    "[EXPLORER-ADDRESS-01] Canonical address cache rebuilt entries=" +
+                    std::to_string(rebuiltCount));
+            }
 
             if (walletPtr) {
                 try {
@@ -20181,11 +20245,75 @@ bool Blockchain::rollbackBlockWithSubmissionLockHeld(
     // Derived caches are not consensus state. Invalidate/rebuild them only after
     // the durable disconnect succeeds. Clearing is safer than trying to infer a
     // partial inverse from historical cache contents.
-    {
-        std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
-        addressCache.clear();
-    }
+    // [EXPLORER-ADDRESS-01] Durable-derived explorer cache repair.
+    // Build a complete replacement OFF-LOCK, then publish it atomically.
+    // This changes no confirmed state; it only reconstructs addressCache.
     invalidateUTXOCache();
+    {
+        std::unordered_set<std::string> explorerAddressSet;
+        dbStorage.iteratePrefix("address:", [&](const std::string& key, const std::string&) {
+            std::string rest = key;
+            if (rest.rfind("address:", 0) == 0) {
+                rest = rest.substr(sizeof("address:") - 1);
+            }
+
+            // Mirror explorer-startup parsing: reject canonical contract outpoints
+            // before slicing the first ':' as the TRU address boundary.
+            const size_t firstColon = rest.find(':');
+            const size_t secondColon = firstColon == std::string::npos
+                ? std::string::npos
+                : rest.find(':', firstColon + 1);
+            if (firstColon != std::string::npos &&
+                secondColon != std::string::npos &&
+                tru_contract_state::IsCanonicalContractOutpoint(
+                    rest.substr(0, secondColon))) {
+                return;
+            }
+
+            const std::string addr = (firstColon == std::string::npos)
+                ? rest
+                : rest.substr(0, firstColon);
+            if (!addr.empty() && isValidAddress(addr)) {
+                explorerAddressSet.insert(addr);
+            }
+        });
+
+        decltype(addressCache) rebuiltAddressCache;
+        for (const auto& addr : explorerAddressSet) {
+            int txCount = 0;
+            std::string rawCount;
+            if (dbStorage.getWithDataChecksum(
+                "address:" + addr + ":txCount", rawCount)) {
+                try { txCount = std::stoi(rawCount); }
+                catch (...) { txCount = 0; }
+            }
+
+            double balanceTru = 0.0;
+            try {
+                const uint64_t atoms = calculate_balance(addr);
+                balanceTru = static_cast<double>(atoms) / 100000000.0;
+            } catch (const std::exception& e) {
+                Logger::log(
+                    "[EXPLORER-ADDRESS-01] balance rebuild failed for " +
+                    addr + ": " + e.what());
+            } catch (...) {
+                Logger::log(
+                    "[EXPLORER-ADDRESS-01] balance rebuild failed for " + addr);
+            }
+
+            rebuiltAddressCache[addr].balance = balanceTru;
+            rebuiltAddressCache[addr].txCount = txCount;
+        }
+
+        const size_t rebuiltCount = rebuiltAddressCache.size();
+        {
+            std::unique_lock<std::shared_mutex> cacheLock(addressCacheMutex);
+            addressCache.swap(rebuiltAddressCache);
+        }
+        Logger::log(
+            "[EXPLORER-ADDRESS-01] Canonical address cache rebuilt entries=" +
+            std::to_string(rebuiltCount));
+    }
 
     if (walletPtr) {
         try {
