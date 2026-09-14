@@ -4104,72 +4104,46 @@ static json handleSendToken(Blockchain &chain, Wallet &wallet, const json &p, in
 // New HD address
 //========================
 static json handleGetNewAddress(Wallet& wallet, const json &/*params*/, int id) {
-    // SEC-14E.3.3B: no encrypted fallback to plaintext seed/storage.
-    if (wallet.getWalletSecurityMode() != WalletSecurityModeV1::LEGACY_PLAINTEXT) {
-        throw std::runtime_error(
-            "RPC getnewaddress is disabled for encrypted wallets until authenticated persistence is active");
-    }
-
-    // SEC-14D.1: gate before loading seed / constructing local HDWallet.
-    wallet.requirePrivateAccess("RPC getnewaddress");
     try {
-        // SEC-14B.1: all HD seed access goes through the canonical wallet
-        // seed loader. RPC must not maintain an independent seed file,
-        // environment-path override, RNG path, or file-creation path.
-        const std::vector<uint8_t> seed = loadWalletSeed();
-        if (seed.size() != HDWallet::SEED_SIZE) {
-            throw std::runtime_error("Canonical wallet seed has unexpected size");
+        if (wallet.getWalletSecurityMode() == WalletSecurityModeV1::ENCRYPTED_LOCKED) {
+            return makeError(
+                -32000,
+                "getnewaddress requires an unlocked encrypted wallet");
+        }
+        if (wallet.getWalletSecurityMode() != WalletSecurityModeV1::ENCRYPTED_UNLOCKED) {
+            return makeError(
+                -32000,
+                "getnewaddress is available only through the authenticated encrypted wallet");
         }
 
-        std::array<uint8_t, HDWallet::SEED_SIZE> arr;
-        std::copy_n(seed.begin(), seed.size(), arr.begin());
-        HDWallet hd(arr);
-        
-        // Get the index
-        uint32_t idx = getNextIndex();
-        Logger::log("[handleGetNewAddress] Using HD wallet index: " + std::to_string(idx));
-        
-        // Get the private key string from HD wallet
-        std::string privStr = hd.derivePrivateKey(idx);
-        
-        // Convert string to bytes
-        std::vector<uint8_t> privKeyBytes(privStr.begin(), privStr.end());
-        
-        // Verify it's 32 bytes
-        if (privKeyBytes.size() != 32) {
-            Logger::log("[handleGetNewAddress] ERROR: Private key is " + 
-                       std::to_string(privKeyBytes.size()) + " bytes, expected 32!");
-            throw std::runtime_error("Private key must be 32 bytes");
+        std::string address;
+        std::string publicKeyHex;
+        std::uint32_t index = 0U;
+        std::string error;
+        if (!wallet.generateNewAddressEncrypted(
+                address,
+                publicKeyHex,
+                index,
+                &error)) {
+            return makeError(
+                -32000,
+                error.empty()
+                    ? "authenticated encrypted getnewaddress failed"
+                    : error);
         }
-        
-        // Create ECDSAKey from the raw private key bytes
-        ECDSAKey key = ECDSAKey::fromRawBytes(privKeyBytes);
-        auto pub = key.getCompressedSec1();
-        auto addr = pubkeyToAddress(pub);
-        
-        // Convert private key to hex for internal validation only; never return or log it
-        std::string privHex = hexEncode(privKeyBytes);
-        std::string pubHex = hexEncode(pub);
-        
-        // Log for debugging
-        Logger::log("[handleGetNewAddress] Generated address: " + addr);
-        Logger::log("[handleGetNewAddress] Derived private key validated in memory; key material not logged");
-        Logger::log("[handleGetNewAddress] Public key hex (first 10 chars): " + pubHex.substr(0, 10) + "...");
-        
-        // Verify the private key is not the same as public key
-        if (privHex.substr(0, 2) == "02" || privHex.substr(0, 2) == "03") {
-            Logger::log("[handleGetNewAddress] CRITICAL ERROR: Private key starts with 02/03!");
-            throw std::runtime_error("Private key appears to be a public key!");
-        }
-        
+
+        Logger::log(
+            "[handleGetNewAddress] WALLET-ADDRESS-01 generated index=" +
+            std::to_string(index) + " address=" + address);
         return makeResult(id, json{
-            {"address", addr}, 
-            {"publicKey", pubHex}, 
-            
-            {"index", idx}
+            {"address", address},
+            {"publicKey", publicKeyHex},
+            {"index", index}
         });
-    } catch (const std::exception &e) {
-        Logger::log("[handleGetNewAddress] Error: " + std::string(e.what()));
+    } catch (const std::exception& e) {
+        Logger::log(
+            "[handleGetNewAddress] WALLET-ADDRESS-01 error: " +
+            std::string(e.what()));
         return makeError(-32000, e.what());
     }
 }

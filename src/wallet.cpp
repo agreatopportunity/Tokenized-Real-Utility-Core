@@ -2261,6 +2261,8 @@ bool Wallet::setCurrentAddressEncrypted(
     const std::string& passphrase,
     std::string* errorOut)
 {
+    std::lock_guard<std::mutex> mutationLock(encryptedMutationMutex_);
+
     auto setError = [errorOut](const std::string& msg) {
         if (errorOut) *errorOut = msg;
     };
@@ -2809,6 +2811,300 @@ bool Wallet::provisionSwapRoleKeysV1(
 
 
 
+
+//===============================================================================
+// WALLET-ADDRESS-01 — authenticated public-only persistence
+//===============================================================================
+bool Wallet::persistEncryptedWalletPublicMetadata(
+    std::string* errorOut)
+{
+    auto setError = [errorOut](const std::string& msg) {
+        if (errorOut) *errorOut = msg;
+    };
+
+    if (getWalletSecurityMode() != WalletSecurityModeV1::ENCRYPTED_UNLOCKED ||
+        !walletSecurityController_->sessionUnlocked()) {
+        setError(
+            "encrypted public-wallet persistence requires ENCRYPTED_UNLOCKED session");
+        return false;
+    }
+
+    const auto artifacts = walletEncryptedStartupArtifactsV1(walletFilePath);
+    if (!artifacts.completeEncryptedSet) {
+        setError("encrypted public-wallet persistence requires complete artifact set");
+        return false;
+    }
+
+    std::vector<std::string> publicAddresses;
+    std::uint32_t publicCurrent = 0U;
+    {
+        std::lock_guard<std::mutex> lk(addressesMutex);
+        publicAddresses = addresses;
+        publicCurrent = currentIndex;
+    }
+
+    if (publicAddresses.empty() || publicCurrent >= publicAddresses.size()) {
+        setError("cannot persist invalid public wallet address/index state");
+        return false;
+    }
+
+    json publicJson;
+    publicJson["addresses"] = publicAddresses;
+    publicJson["currentIndex"] = publicCurrent;
+    publicJson["format"] = "TRU_WALLET_PUBLIC_V1";
+    if (publicJson.contains("privateKeys")) {
+        setError("public wallet metadata unexpectedly contains privateKeys");
+        return false;
+    }
+
+    const std::string publicText = publicJson.dump() + "\n";
+    const std::string tempPath =
+        artifacts.publicPath + ".walletaddr01." +
+        std::to_string(static_cast<unsigned long long>(::getpid())) + ".new";
+    bool published = false;
+
+    try {
+        // Do not interleave a public-only write with an unfinished pair-level
+        // SEC-14E.3.4C transaction. Recovery remains authoritative.
+        verifyWalletTxnRecoveryStateV1(walletFilePath);
+
+        if (std::filesystem::exists(tempPath)) {
+            throw std::runtime_error(
+                "WALLET-ADDRESS-01 public metadata stage collision");
+        }
+
+        const int fd = ::open(
+            tempPath.c_str(),
+            O_WRONLY | O_CREAT | O_EXCL,
+            S_IRUSR | S_IWUSR);
+        if (fd < 0) {
+            throw std::runtime_error(
+                "WALLET-ADDRESS-01 cannot create public metadata stage: " +
+                std::string(std::strerror(errno)));
+        }
+
+        bool fdOpen = true;
+        try {
+            std::size_t off = 0U;
+            while (off < publicText.size()) {
+                const ssize_t n = ::write(
+                    fd,
+                    publicText.data() + off,
+                    publicText.size() - off);
+                if (n < 0) {
+                    if (errno == EINTR) continue;
+                    throw std::runtime_error(
+                        "WALLET-ADDRESS-01 public metadata write failed: " +
+                        std::string(std::strerror(errno)));
+                }
+                if (n == 0) {
+                    throw std::runtime_error(
+                        "WALLET-ADDRESS-01 public metadata short write");
+                }
+                off += static_cast<std::size_t>(n);
+            }
+            if (::fsync(fd) != 0) {
+                throw std::runtime_error(
+                    "WALLET-ADDRESS-01 public metadata fsync failed: " +
+                    std::string(std::strerror(errno)));
+            }
+            if (::close(fd) != 0) {
+                fdOpen = false;
+                throw std::runtime_error(
+                    "WALLET-ADDRESS-01 public metadata close failed: " +
+                    std::string(std::strerror(errno)));
+            }
+            fdOpen = false;
+        } catch (...) {
+            if (fdOpen) ::close(fd);
+            ::unlink(tempPath.c_str());
+            throw;
+        }
+
+        if (::rename(tempPath.c_str(), artifacts.publicPath.c_str()) != 0) {
+            const int saved = errno;
+            ::unlink(tempPath.c_str());
+            throw std::runtime_error(
+                "WALLET-ADDRESS-01 public metadata atomic rename failed: " +
+                std::string(std::strerror(saved)));
+        }
+        published = true;
+        fsyncParentDirectoryTxnV1(artifacts.publicPath);
+
+        std::ifstream verifyIn(artifacts.publicPath);
+        if (!verifyIn.good()) {
+            throw std::runtime_error(
+                "WALLET-ADDRESS-01 cannot reopen committed public metadata");
+        }
+        json verified;
+        verifyIn >> verified;
+        if (verified != publicJson) {
+            throw std::runtime_error(
+                "WALLET-ADDRESS-01 committed public metadata readback mismatch");
+        }
+        return true;
+    } catch (const std::exception& e) {
+        if (!published) {
+            ::unlink(tempPath.c_str());
+            setError(e.what());
+            return false;
+        }
+
+        // Rename occurred but durability/readback failed. Do not continue with
+        // an authenticated signing session whose durable public state is
+        // uncertain. Startup will reload the authoritative committed file.
+        lockEncryptedWallet();
+        setError(
+            std::string(
+                "WALLET-ADDRESS-01 public metadata publication became uncertain; "
+                "wallet relocked and restart is required: ") + e.what());
+        return false;
+    }
+}
+
+//===============================================================================
+// WALLET-ADDRESS-01 — authenticated encrypted getnewaddress
+//===============================================================================
+bool Wallet::generateNewAddressEncrypted(
+    std::string& addressOut,
+    std::string& publicKeyHexOut,
+    std::uint32_t& indexOut,
+    std::string* errorOut)
+{
+    std::lock_guard<std::mutex> mutationLock(encryptedMutationMutex_);
+
+    addressOut.clear();
+    publicKeyHexOut.clear();
+    indexOut = 0U;
+    auto setError = [errorOut](const std::string& msg) {
+        if (errorOut) *errorOut = msg;
+    };
+
+    if (getWalletSecurityMode() != WalletSecurityModeV1::ENCRYPTED_UNLOCKED ||
+        !walletSecurityController_->sessionUnlocked()) {
+        setError("getnewaddress requires an authenticated ENCRYPTED_UNLOCKED wallet");
+        return false;
+    }
+    requirePrivateAccess("generateNewAddressEncrypted");
+
+    std::vector<std::string> beforeAddresses;
+    std::uint32_t beforeCurrent = 0U;
+    std::uint32_t beforeAddressIndex = 0U;
+    {
+        std::lock_guard<std::mutex> lk(addressesMutex);
+        beforeAddresses = addresses;
+        beforeCurrent = currentIndex;
+        beforeAddressIndex = addressIndex;
+    }
+
+    // Children 1 and 2 are permanently reserved by TRU-SWAP-B. The existing
+    // production wallet provisions them at public positions 1 and 2. Refuse
+    // ambiguous address ordering rather than consume or renumber a swap key.
+    if (beforeAddresses.size() < 3U) {
+        setError(
+            "WALLET-ADDRESS-01 requires reserved swap HD children 1/2 to be "
+            "provisioned before general address generation");
+        return false;
+    }
+    if (beforeAddresses.size() >
+        static_cast<std::size_t>(std::numeric_limits<std::uint32_t>::max())) {
+        setError("WALLET-ADDRESS-01 address index overflow");
+        return false;
+    }
+
+    // Prove the persisted public ordering is the canonical HD-child ordering.
+    // This makes the address position itself a durable HD index without
+    // introducing a second plaintext index database.
+    try {
+        for (std::size_t i = 0; i < beforeAddresses.size(); ++i) {
+            const auto pub = deriveHDPublicKey(static_cast<std::uint32_t>(i));
+            if (pubkeyToAddress(pub) != beforeAddresses[i]) {
+                setError(
+                    "WALLET-ADDRESS-01 refuses non-canonical/ambiguous HD address ordering");
+                return false;
+            }
+        }
+    } catch (const std::exception& e) {
+        setError(std::string("WALLET-ADDRESS-01 HD ordering proof failed: ") + e.what());
+        return false;
+    }
+
+    const std::uint32_t idx =
+        static_cast<std::uint32_t>(beforeAddresses.size());
+    std::vector<unsigned char> pub;
+    std::string addr;
+    std::string privPem;
+    try {
+        pub = deriveHDPublicKey(idx);
+        if (pub.size() != 33U || (pub[0] != 0x02U && pub[0] != 0x03U)) {
+            throw std::runtime_error("derived compressed public key is invalid");
+        }
+        addr = pubkeyToAddress(pub);
+        if (addr.empty()) {
+            throw std::runtime_error("derived address is empty");
+        }
+        if (std::find(beforeAddresses.begin(), beforeAddresses.end(), addr) !=
+            beforeAddresses.end()) {
+            throw std::runtime_error("derived address already exists in wallet");
+        }
+
+        // Spendability proof before publishing public state. The private key is
+        // derived only from the authenticated encrypted seed, never persisted
+        // in plaintext and never returned by RPC.
+        privPem = deriveHDPrivateKey(idx);
+        const ECDSAKey key = ECDSAKey::fromPrivateKey(privPem);
+        if (key.getCompressedSec1() != pub) {
+            throw std::runtime_error("derived private/public binding mismatch");
+        }
+    } catch (const std::exception& e) {
+        if (!privPem.empty()) {
+            sodium_memzero(privPem.data(), privPem.size());
+            privPem.clear();
+        }
+        setError(std::string("WALLET-ADDRESS-01 derivation failed: ") + e.what());
+        return false;
+    }
+    if (!privPem.empty()) {
+        sodium_memzero(privPem.data(), privPem.size());
+        privPem.clear();
+        privPem.shrink_to_fit();
+    }
+
+    {
+        std::lock_guard<std::mutex> lk(addressesMutex);
+        if (addresses != beforeAddresses ||
+            currentIndex != beforeCurrent ||
+            addressIndex != beforeAddressIndex) {
+            setError("WALLET-ADDRESS-01 concurrent wallet mutation detected");
+            return false;
+        }
+        addresses.push_back(addr);
+        addressIndex = static_cast<std::uint32_t>(addresses.size());
+        currentIndex = idx;
+    }
+
+    std::string persistError;
+    if (!persistEncryptedWalletPublicMetadata(&persistError)) {
+        if (getWalletSecurityMode() == WalletSecurityModeV1::ENCRYPTED_UNLOCKED) {
+            std::lock_guard<std::mutex> lk(addressesMutex);
+            addresses = beforeAddresses;
+            currentIndex = beforeCurrent;
+            addressIndex = beforeAddressIndex;
+        }
+        setError(
+            "WALLET-ADDRESS-01 public persistence failed: " + persistError);
+        return false;
+    }
+
+    addressOut = addr;
+    publicKeyHexOut = bytesToHex(pub);
+    indexOut = idx;
+    Logger::log(
+        "[WALLET-ADDRESS-01] generated authenticated encrypted HD address index=" +
+        std::to_string(idx) + " address=" + addr);
+    return true;
+}
+
 std::string Wallet::create_wallet(const std::string& filePath) {
     // SEC-14D.0: creation is create-only. Never allow a load/decrypt/parse
     // failure to fall through into truncating or replacing an existing wallet.
@@ -3007,13 +3303,43 @@ std::string Wallet::getPrivateKeyForAddress(const std::string& addr) {
                 "[getPrivateKeyForAddress] authenticated private material is not an object");
         }
 
-        const auto it = privateObject.find(addr);
-        if (it == privateObject.end() || !it->is_string()) {
-            throw std::runtime_error(
-                "[getPrivateKeyForAddress] Unknown address");
+        const auto persisted = privateObject.find(addr);
+        if (persisted != privateObject.end()) {
+            if (!persisted->is_string()) {
+                throw std::runtime_error(
+                    "[getPrivateKeyForAddress] persisted private key has invalid encoding");
+            }
+            return persisted->get<std::string>();
         }
 
-        return it->get<std::string>();
+        // WALLET-ADDRESS-01: newly generated encrypted-wallet receive keys are
+        // deterministic HD children of the authenticated encrypted seed. They
+        // intentionally do not duplicate PEM material into tru.dat.enc.
+        std::uint32_t hdIndex = 0U;
+        {
+            std::lock_guard<std::mutex> lk(addressesMutex);
+            const auto it = std::find(addresses.begin(), addresses.end(), addr);
+            if (it == addresses.end()) {
+                throw std::runtime_error(
+                    "[getPrivateKeyForAddress] Unknown address");
+            }
+            const auto distance = std::distance(addresses.begin(), it);
+            if (distance < 0 ||
+                static_cast<unsigned long long>(distance) >
+                    static_cast<unsigned long long>(
+                        std::numeric_limits<std::uint32_t>::max())) {
+                throw std::runtime_error(
+                    "[getPrivateKeyForAddress] HD address index overflow");
+            }
+            hdIndex = static_cast<std::uint32_t>(distance);
+        }
+
+        const auto pub = deriveHDPublicKey(hdIndex);
+        if (pubkeyToAddress(pub) != addr) {
+            throw std::runtime_error(
+                "[getPrivateKeyForAddress] address is not bound to its canonical HD index");
+        }
+        return deriveHDPrivateKey(hdIndex);
     }
 
     std::lock_guard<std::mutex> lk(addressesMutex);

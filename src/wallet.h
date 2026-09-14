@@ -496,6 +496,15 @@ public:
         const std::string& passphrase,
         std::string* errorOut = nullptr);
 
+
+    // WALLET-ADDRESS-01: generate the next canonical HD receive address from
+    // the authenticated encrypted session. No passphrase/private key crosses RPC.
+    bool generateNewAddressEncrypted(
+        std::string& addressOut,
+        std::string& publicKeyHexOut,
+        std::uint32_t& indexOut,
+        std::string* errorOut = nullptr);
+
     // TRU-SWAP-B: deterministic public view of reserved swap role keys.
     // Requires the encrypted wallet to be authenticated/unlocked.
     TruSwapRoleKeysV1 getSwapRoleKeysV1() const;
@@ -625,7 +634,15 @@ private:
     std::unordered_map<std::string, LocalUtxo> localUtxos;
     const Mempool* mempool;
     mutable std::mutex addressesMutex;
+    // WALLET-ADDRESS-01: serializes authenticated public-wallet mutations.
+    mutable std::mutex encryptedMutationMutex_;
     std::unordered_map<std::string, std::string> privateKeys;
+
+    // WALLET-ADDRESS-01: public metadata contains no secret material, so an
+    // already-authenticated encrypted session can durably publish it without
+    // retaining or accepting the wallet passphrase over RPC.
+    bool persistEncryptedWalletPublicMetadata(
+        std::string* errorOut = nullptr);
 
     // SEC-14D.2: the controller exclusively owns security mode + secret
     // session transitions. There is intentionally no independent mode member.
