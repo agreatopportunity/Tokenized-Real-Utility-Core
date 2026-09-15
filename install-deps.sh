@@ -59,16 +59,17 @@ have_lib()    { echo 'int main(){return 0;}' | c++ -x c++ - -l"$1" -o /dev/null 
 report() {
     local missing=0
     info "Commands"
-    for c in cc c++ cmake git make pkg-config protoc autoconf automake libtool python3; do
+    for c in cc c++ cmake git make pkg-config protoc autoconf automake libtool libtoolize python3 clinfo; do
         if have_cmd "$c"; then ok "$c"; else miss "$c"; missing=1; fi
     done
     info "Headers"
     for h in openssl/evp.h leveldb/db.h google/protobuf/message.h boost/version.hpp \
-             curl/curl.h fmt/core.h json/json.h sodium.h; do
+             curl/curl.h fmt/core.h jsoncpp/json/json.h nlohmann/json.hpp sodium.h \
+             CL/cl.h qrencode.h httplib.h; do
         if have_header "$h"; then ok "$h"; else miss "$h"; missing=1; fi
     done
-    info "Libraries built from source"
-    for l in crc32c keccak ethash wallycore; do
+    info "Libraries"
+    for l in OpenCL qrencode crc32c keccak ethash wallycore; do
         if have_lib "$l"; then ok "lib$l"; else miss "lib$l"; missing=1; fi
     done
     if have_header cxxopts.hpp; then ok "cxxopts.hpp"; else miss "cxxopts.hpp"; missing=1; fi
@@ -105,9 +106,18 @@ fi
 $SUDO apt-get update
 $SUDO apt-get install -y --no-install-recommends \
     build-essential cmake git ca-certificates pkg-config \
-    autoconf automake libtool python3 python3-dev libssl-dev \
+    autoconf automake libtool libtool-bin python3 python3-dev libssl-dev \
     protobuf-compiler libprotobuf-dev "$BOOST_PKG" libleveldb-dev \
-    libcurl4-openssl-dev libfmt-dev libjsoncpp-dev libsodium-dev
+    libcurl4-openssl-dev libfmt-dev libjsoncpp-dev nlohmann-json3-dev libsodium-dev \
+    ocl-icd-opencl-dev opencl-headers clinfo libqrencode-dev libcpp-httplib-dev
+
+# The ICD loader/dev package is sufficient to build the GPU miner. Actual GPU
+# discovery at runtime also requires a vendor OpenCL ICD (AMD/NVIDIA/Intel).
+# We deliberately do not install a vendor-specific GPU stack here.
+if [[ -d /etc/OpenCL/vendors ]]; then
+    info "Installed OpenCL ICD descriptors"
+    find /etc/OpenCL/vendors -maxdepth 1 -type f -name '*.icd' -print 2>/dev/null || true
+fi
 
 # ---------------------------------------------------------------------------
 # Dependencies not packaged by the distribution.

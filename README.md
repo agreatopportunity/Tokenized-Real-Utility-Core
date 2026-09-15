@@ -1609,5 +1609,44 @@ That combination is the core of **Tokenized Real Utility**.
 
 ---
 
-**TRU — Tokenized Real Utility**  
+# Links
+
+### Run a node
+
+```bash
+# CPU
+docker pull ghcr.io/agreatopportunity/tru-node:v2.0.8
+
+# NVIDIA GPU
+docker pull ghcr.io/agreatopportunity/tru-node-gpu:v2.0.8
+```
+
+Full deployment guide: **[TRU-DOCKER](https://github.com/agreatopportunity/TRU-DOCKER)**
+
+All published image versions:
+[tru-node](https://github.com/users/agreatopportunity/packages/container/tru-node/versions) ·
+[tru-node-gpu](https://github.com/users/agreatopportunity/packages/container/tru-node-gpu/versions)
+
+### Network
+
+| | |
+|---|---|
+| Block explorer | [tokenizedrealutility.com](https://tokenizedrealutility.com/) |
+| Web wallet | [tokenizedrealutility.com/wallet.html](https://tokenizedrealutility.com/wallet.html) |
+
+### Community
+
+| | |
+|---|---|
+| Telegram | [t.me/TRUBLOC](https://t.me/TRUBLOC) |
+| X | [@TRUBLOCKCHAIN](https://x.com/TRUBLOCKCHAIN) |
+| Reddit | [r/TRUBLOC](https://www.reddit.com/r/TRUBLOC/) |
+| Discord | [discord.gg/utFCQdSdC](https://discord.gg/utFCQdSdC) |
+| Signal | [Join group](https://signal.group/#CjQKIIenthb40lSmT47CstsKTwKkNua3ecYfcD2Ajqw3N5A4EhC1thDa8b4Cw9MofM2OT9tv) |
+
+Issues and pull requests are welcome on this repository.
+
+---
+
+**TRU — Tokenized Real Utility**
 *UTXO ownership. Proof-of-Work settlement. Stateful contracts. Native assets. Verifiable AI evolution.*

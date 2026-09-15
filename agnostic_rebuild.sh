@@ -30,7 +30,7 @@ umask 077
 #   TRU_DATA_HOME=/persistent/location
 #   TRU_WALLET_STORE=/persistent/location/wallet
 #   TRU_RUNTIME_STORE=/persistent/location/runtime
-#   TRU_BUILD_WITH_QT=OFF
+#   TRU_BUILD_WITH_QT=OFF   # default is OFF; set ON for desktop Qt build
 #   TRU_CMAKE_ARGS="-DFOO=ON -DBAR=/path"
 # ============================================================================
 
@@ -46,6 +46,7 @@ CLEAN_FIRST=0
 PURGE_BUILD=0
 RESET_UTXO=0
 JOBS="${TRU_BUILD_JOBS:-}"
+TRU_BUILD_WITH_QT="${TRU_BUILD_WITH_QT:-OFF}"
 
 usage() {
     cat <<'EOF'
@@ -206,23 +207,65 @@ if [[ -n "${CONDA_PREFIX:-}" ]]; then
        TRU's C++ build uses system packages only."
 fi
 
-for cmd in cmake sha256sum install protoc git; do
+for cmd in cmake sha256sum install protoc git pkg-config; do
     command -v "$cmd" >/dev/null 2>&1 ||
         fail "required command is not installed: $cmd
        Run ./install-deps.sh first."
 done
 
+# Debian/Ubuntu installs JsonCpp headers under /usr/include/jsoncpp while some
+# TRU source uses <json/...>. Derive the include root from pkg-config instead
+# of hard-coding an architecture-specific path.
+if pkg-config --exists jsoncpp 2>/dev/null; then
+    JSONCPP_CFLAGS="$(pkg-config --cflags-only-I jsoncpp 2>/dev/null || true)"
+    for flag in $JSONCPP_CFLAGS; do
+        case "$flag" in
+            -I*)
+                jsoncpp_inc="${flag#-I}"
+                case ":${CPATH:-}:" in
+                    *":$jsoncpp_inc:"*) ;;
+                    *) export CPATH="$jsoncpp_inc${CPATH:+:$CPATH}" ;;
+                esac
+                ;;
+        esac
+    done
+fi
+
 # Check the libraries too, not just the commands. Without this a missing
-# -dev package surfaces as a wall of CMake errors instead of one sentence.
+# -dev package surfaces as a wall of compiler/CMake errors instead of one
+# actionable sentence.
 if command -v c++ >/dev/null 2>&1; then
-    for hdr in openssl/evp.h leveldb/db.h cxxopts.hpp ethash/keccak.hpp; do
+    REQUIRED_HEADERS=(
+        openssl/evp.h
+        leveldb/db.h
+        cxxopts.hpp
+        ethash/keccak.hpp
+        nlohmann/json.hpp
+        qrencode.h
+        httplib.h
+    )
+    if [[ "$ARCH" == "native" ]]; then
+        REQUIRED_HEADERS+=(CL/cl.h)
+    fi
+
+    for hdr in "${REQUIRED_HEADERS[@]}"; do
         echo "#include <$hdr>" | c++ -E -x c++ - >/dev/null 2>&1 ||
             fail "missing build dependency header: $hdr
        Run ./install-deps.sh first."
     done
+
     echo 'int main(){return 0;}' | c++ -x c++ - -lkeccak -o /dev/null >/dev/null 2>&1 ||
         fail "libkeccak not found (provided by ethash)
        Run ./install-deps.sh first."
+
+    if [[ "$ARCH" == "native" ]]; then
+        echo 'int main(){return 0;}' | c++ -x c++ - -lOpenCL -o /dev/null >/dev/null 2>&1 ||
+            fail "OpenCL development library not found
+       Run ./install-deps.sh first."
+        echo 'int main(){return 0;}' | c++ -x c++ - -lqrencode -o /dev/null >/dev/null 2>&1 ||
+            fail "libqrencode development library not found
+       Run ./install-deps.sh first."
+    fi
 fi
 
 [[ -f "$REPO_ROOT/CMakeLists.txt" ]] ||
@@ -251,6 +294,7 @@ echo "RUN_AFTER_BUILD=$RUN_AFTER_BUILD"
 echo "CLEAN_FIRST=$CLEAN_FIRST"
 echo "PURGE_BUILD=$PURGE_BUILD"
 echo "RESET_UTXO=$RESET_UTXO"
+echo "BUILD_WITH_QT=$TRU_BUILD_WITH_QT"
 echo
 
 # ---------------------------------------------------------------------------
@@ -380,6 +424,43 @@ fi
 mkdir -p "$BUILD_DIR"
 
 # ---------------------------------------------------------------------------
+# Protobuf generated-source compatibility.
+#
+# message.proto is canonical. A checkout may contain message.pb.h/.cc generated
+# by a newer protoc than the machine-local libprotobuf headers. Test the
+# checked-in header against this machine; regenerate only when incompatible.
+# ---------------------------------------------------------------------------
+PROTO_SCHEMA="$REPO_ROOT/src/message.proto"
+PROTO_HEADER="$REPO_ROOT/src/message.pb.h"
+PROTO_SOURCE="$REPO_ROOT/src/message.pb.cc"
+
+[[ -f "$PROTO_SCHEMA" ]] || fail "protobuf schema missing: $PROTO_SCHEMA"
+
+protobuf_header_compatible() {
+    [[ -f "$PROTO_HEADER" ]] || return 1
+    local pb_cflags
+    pb_cflags="$(pkg-config --cflags protobuf 2>/dev/null || true)"
+    # shellcheck disable=SC2086
+    printf '#include "message.pb.h"\nint main(){return 0;}\n' |
+        c++ -std=c++17 -fsyntax-only -x c++ -I"$REPO_ROOT/src" $pb_cflags -         >/dev/null 2>&1
+}
+
+if protobuf_header_compatible; then
+    echo "PROTOBUF_BINDINGS=COMPATIBLE"
+else
+    info "Regenerating protobuf bindings with machine-local $(protoc --version)..."
+    (
+        cd "$REPO_ROOT/src"
+        protoc --cpp_out=. --proto_path=. message.proto
+    )
+    [[ -s "$PROTO_HEADER" && -s "$PROTO_SOURCE" ]] ||
+        fail "protoc did not generate src/message.pb.h and src/message.pb.cc"
+    protobuf_header_compatible ||
+        fail "regenerated protobuf header is still incompatible with local headers"
+    echo "PROTOBUF_REGEN=PASS"
+fi
+
+# ---------------------------------------------------------------------------
 # Portable CMake configuration.
 #
 # Important: there are no hard-coded /usr/lib/x86_64-linux-gnu or /usr/bin
@@ -420,9 +501,7 @@ case "$ARCH" in
         ;;
 esac
 
-if [[ -n "${TRU_BUILD_WITH_QT:-}" ]]; then
-    CMAKE_ARGS+=("-DBUILD_WITH_QT=$TRU_BUILD_WITH_QT")
-fi
+CMAKE_ARGS+=("-DBUILD_WITH_QT=$TRU_BUILD_WITH_QT")
 
 if command -v protoc >/dev/null 2>&1; then
     CMAKE_ARGS+=(
